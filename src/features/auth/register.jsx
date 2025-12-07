@@ -25,62 +25,70 @@ const AuthRegister = () => {
     };
 
     return (
-        <div className="container">
-            <form onSubmit={handleRegister} className="form">
-                <h2>Register</h2>
-                <div className="form-group">
-                    <input 
-                        className="form-control" 
-                        type="text" 
-                        placeholder="Username" 
-                        value={username} 
-                        onChange={(e) => setUsername(e.target.value)} 
-                        required 
-                    />
+        <div className="container mt-5">
+            <div className="row justify-content-center">
+                <div className="col-md-4">
+                    <form onSubmit={handleRegister} className="shadow p-4 rounded bg-light">
+                        <h2 className="text-center">Register</h2>
+                        <div className="form-group mb-3">
+                            <input 
+                                className="form-control" 
+                                type="text" 
+                                placeholder="Username" 
+                                value={username} 
+                                onChange={(e) => setUsername(e.target.value)} 
+                                required 
+                            />
+                        </div>
+                        <div className="form-group mb-3">
+                            <input 
+                                className="form-control" 
+                                type="password" 
+                                placeholder="Password" 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required 
+                            />
+                        </div>
+                        <div className="form-group mb-3">
+                            <input 
+                                className="form-control" 
+                                type="email" 
+                                placeholder="Email" 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)} 
+                                required 
+                            />
+                        </div>
+                        <div className="form-group mb-3">
+                            <input 
+                                className="form-control" 
+                                type="text" 
+                                placeholder="Phone" 
+                                value={phone} 
+                                onChange={(e) => setPhone(e.target.value)} 
+                            />
+                        </div>
+                        <div className="form-group mb-3">
+                            <input 
+                                className="form-control" 
+                                type="text" 
+                                placeholder="Role" 
+                                value={role} 
+                                onChange={(e) => setRole(e.target.value)} 
+                            />
+                        </div>
+                        <button className="btn btn-primary btn-block" type="submit">
+                            Register
+                        </button>
+                        {error && <div className="alert alert-danger mt-3">{error}</div>}
+                        <div className="text-center mt-3">
+                            <span>Already have an account? </span>
+                            <a href="/login">Login</a> {/* קישור להתחברות */}
+                        </div>
+                    </form>
                 </div>
-                <div className="form-group">
-                    <input 
-                        className="form-control" 
-                        type="password" 
-                        placeholder="Password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                        required 
-                    />
-                </div>
-                <div className="form-group">
-                    <input 
-                        className="form-control" 
-                        type="email" 
-                        placeholder="Email" 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        required 
-                    />
-                </div>
-                <div className="form-group">
-                    <input 
-                        className="form-control" 
-                        type="text" 
-                        placeholder="Phone" 
-                        value={phone} 
-                        onChange={(e) => setPhone(e.target.value)} 
-                    />
-                </div>
-                <div className="form-group">
-                    <input 
-                        className="form-control" 
-                        type="text" 
-                        placeholder="Role" 
-                        value={role} 
-                        onChange={(e) => setRole(e.target.value)} 
-                    />
-                </div>
-                <button className="btn btn-primary btn-block" type="submit">
-                    Register
-                </button>
-                {error && <div className="alert alert-danger">{error}</div>}
-            </form>
+            </div>
         </div>
     );
 };

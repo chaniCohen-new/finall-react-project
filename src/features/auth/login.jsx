@@ -26,34 +26,42 @@ const AuthLogin = () => {
     };
 
     return (
-        <div className="container">
-            <form onSubmit={handleLogin} className="form">
-                <h2>Login</h2>
-                <div className="form-group">
-                    <input 
-                        className="form-control" 
-                        type="text" 
-                        placeholder="Username" 
-                        value={username} 
-                        onChange={(e) => setUsername(e.target.value)} 
-                        required 
-                    />
+        <div className="container mt-5">
+            <div className="row justify-content-center">
+                <div className="col-md-4">
+                    <form onSubmit={handleLogin} className="shadow p-4 rounded bg-light">
+                        <h2 className="text-center">Login</h2>
+                        <div className="form-group mb-3">
+                            <input 
+                                className="form-control" 
+                                type="text" 
+                                placeholder="Username" 
+                                value={username} 
+                                onChange={(e) => setUsername(e.target.value)} 
+                                required 
+                            />
+                        </div>
+                        <div className="form-group mb-3">
+                            <input 
+                                className="form-control" 
+                                type="password" 
+                                placeholder="Password" 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                                required 
+                            />
+                        </div>
+                        <button className="btn btn-primary btn-block" type="submit">
+                            Login
+                        </button>
+                        {error && <div className="alert alert-danger mt-3">{error}</div>}
+                        <div className="text-center mt-3">
+                            <span>Don't have an account? </span>
+                            <a href="/register">Sign Up</a> {/* קישור להרשמה */}
+                        </div>
+                    </form>
                 </div>
-                <div className="form-group">
-                    <input 
-                        className="form-control" 
-                        type="password" 
-                        placeholder="Password" 
-                        value={password} 
-                        onChange={(e) => setPassword(e.target.value)} 
-                        required 
-                    />
-                </div>
-                <button className="btn btn-primary btn-block" type="submit">
-                    Login
-                </button>
-                {error && <div className="alert alert-danger">{error}</div>}
-            </form>
+            </div>
         </div>
     );
 };
