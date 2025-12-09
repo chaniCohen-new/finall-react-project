@@ -29,7 +29,7 @@ const AuthRegister = () => {
             <div className="row justify-content-center">
                 <div className="col-md-4">
                     <form onSubmit={handleRegister} className="shadow p-4 rounded bg-light">
-                        <h2 className="text-center">Register</h2>
+                        <h2 className="text-center">Sign-Up</h2>
                         <div className="form-group mb-3">
                             <input 
                                 className="form-control" 

@@ -19,7 +19,8 @@ const AuthLogin = () => {
             localStorage.setItem('token', data.token);
             dispatch(setToken({ token: data.token, user: data.user }));
             dispatch(setMessage(data.message));
-            navigate('../lessons/LessonLogin');
+            
+            navigate('../users');
         } catch (err) {
             dispatch(setError(err.response ? err.response.data.message : 'Login failed'));
         }
