@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { fetchUsers } from './service.js'; // יש לוודא שהנתיב נכון
+import { fetchUsers, handleAddUser, deleteUser } from './service.js'; // ודא שהנתיב נכון
+import AddUserModal from './AddUserModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const UserManagementComponent = () => {
@@ -7,6 +8,7 @@ const UserManagementComponent = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -27,7 +29,21 @@ const UserManagementComponent = () => {
         setSearchQuery(e.target.value);
     };
 
-    const filteredUsers = users.filter(user => 
+    const refreshUsers = async () => {
+        const usersData = await fetchUsers();
+        setUsers(usersData);
+    };
+
+    const handleDelete = async (userId) => {
+        try {
+            await deleteUser(userId); // פנה ל-API למחוק את המשתמש
+            setUsers(prevUsers => prevUsers.filter(user => user._id !== userId)); // עדכון המצב
+        } catch (error) {
+            console.error('שגיאה במחיקת המשתמש:', error.message); // הדפס שגיאה לקונסול
+        }
+    };
+    
+    const filteredUsers = users.filter(user =>
         user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -35,8 +51,8 @@ const UserManagementComponent = () => {
     return (
         <div className="container mt-4" style={{ direction: 'ltr', textAlign: 'left' }}>
             <header className="d-flex justify-content-between align-items-center mb-4">
-                <h2>ניהול משתמשים</h2>
-                <button className="btn btn-primary">הוסף משתמש</button>
+                <h2 className="text-center">ניהול משתמשים</h2>
+                <button className="btn btn-primary" onClick={() => setShowModal(true)}>הוסף משתמש</button>
             </header>
 
             <div className="mb-4">
@@ -57,22 +73,22 @@ const UserManagementComponent = () => {
                     <thead className="thead-dark">
                         <tr>
                             <th>שם משתמש</th>
-                            <th>אימייל</th>
+                            <th className="text-center" style={{ minWidth: '100px' }}>אימייל</th>
                             <th>תפקיד</th>
-                            <th>פעולות</th>
+                            <th className="text-center" style={{ minWidth: '50px' }}>פעולות</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredUsers.length > 0 ? (
-                            filteredUsers.map((user, index) => (
-                                <tr key={index}>
+                            filteredUsers.map((user) => (
+                                <tr key={user._id}> {/* השתמש ב-_id כאן */}
                                     <td>{user.username}</td>
                                     <td>{user.email}</td>
                                     <td>{user.role}</td>
                                     <td>
                                         <button className="btn btn-warning btn-sm mr-2">✏️ עריכה</button>
-                                        <button className="btn btn-danger btn-sm">🗑️ מחיקה</button>
-                                    </td>
+                                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(user._id)}>🗑️ מחיקה</button> {/*  השתמש ב-_id כאן */}
+                                        </td>
                                 </tr>
                             ))
                         ) : (
@@ -83,6 +99,9 @@ const UserManagementComponent = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* מודאל להזנת פרטי המשתמש החדש */}
+            <AddUserModal show={showModal} handleClose={() => setShowModal(false)} refreshUsers={refreshUsers} />
         </div>
     );
 };
