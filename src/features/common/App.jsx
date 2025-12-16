@@ -9,6 +9,7 @@ import UserManagementComponent from '../user/ManagmentComponent';
 import StudyWord from '../word/StudyWord';
 import QuizCard from '../test/test';
 import Home from './home';
+import CourseComponent from '../lesson/lessonLogin';
 
 
 function App() {
@@ -21,8 +22,8 @@ function App() {
           <Routes>
             <Route path="/login" element={<AuthLogin />} />
             <Route path="/register" element={<AuthRegister />} />
-            <Route path="/" element={<AuthLogin />} /> {/* ניתוב ברירת מחדל לעמוד הקורסים */}
-            <Route path="/users" element={<UserManagementComponent />} /> {/* ניתוב לעמוד ניהול משתמשים */}
+            <Route path="/" element={<CourseComponent />} /> {/* ניתוב ברירת מחדל לעמוד הקורסים */}
+            <Route path="/users" element={<CourseComponent />} /> {/* ניתוב לעמוד ניהול משתמשים */}
           </Routes>
         </div>
       </Router>

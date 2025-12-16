@@ -1,47 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const StudyWord = () => {
-  return (
-    <div className="container mt-5">
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <a className="navbar-brand" href="#">מערכת ניהול קורסים</a>
-        <div className="collapse navbar-collapse">
-          <ul className="navbar-nav">
-            <li className="nav-item">
-              <a className="nav-link" href="#">בית</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">קורסים</a>
-            </li>
-            <li className="nav-item">
-              <a className="nav-link" href="#">אזור אישי</a>
-            </li>
-          </ul>
-        </div>
-        <button className="btn btn-danger">יציאה</button>
-      </nav>
+const WordTable = () => {
+    const [words, setWords] = useState([]);
 
-      <h2 className="mt-4">נושאים ללימוד</h2>
-      <div className="list-group mt-3">
-        <div className="list-group-item">
-          <h5>animals</h5>
-          <button className="btn btn-primary mr-2">בואו נתחיל</button>
-          <button className="btn btn-secondary">בואו נתרגל</button>
+    useEffect(() => {
+        const fetchWords = async () => {
+            try {
+                const response = await fetch('YOUR_API_URL_HERE'); // הכנס את URL ה-API שלך כאן
+                const data = await response.json();
+                setWords(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchWords();
+    }, []);
+
+    return (
+        <div className="container text-center mt-5">
+            <h2 className="mb-4">Words from Server</h2>
+            <div className="table-responsive">
+                <table className="table table-bordered table-striped">
+                    <thead className="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Word</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {words.map((word, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{word}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div className="list-group-item">
-          <h5>bool</h5>
-          <button className="btn btn-primary mr-2">בואו נתחיל</button>
-          <button className="btn btn-secondary">בואו נתרגל</button>
-        </div>
-        <div className="list-group-item">
-          <h5>vehicle</h5>
-          <button className="btn btn-primary mr-2">בואו נתחיל</button>
-          <button className="btn btn-secondary">בואו נתרגל</button>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
-export default StudyWord;
+export default WordTable;
