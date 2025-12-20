@@ -5,11 +5,12 @@ import AuthRegister from '../auth/register'
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import UserManagementComponent from '../user/ManagmentComponent';
-// import CourseComponent from '../lesson/LessonLogin';
 import StudyWord from '../word/StudyWord';
-import QuizCard from '../test/test';
+import QuizComponent from '../test/test';
 import Home from './home';
 import CourseComponent from '../lesson/lessonLogin';
+import MenuComponent from './home';
+import LevelSelection from '../lesson/LevelSelection';
 
 
 function App() {
@@ -22,8 +23,9 @@ function App() {
           <Routes>
             <Route path="/login" element={<AuthLogin />} />
             <Route path="/register" element={<AuthRegister />} />
-            <Route path="/" element={<CourseComponent />} /> {/* ניתוב ברירת מחדל לעמוד הקורסים */}
-            <Route path="/users" element={<CourseComponent />} /> {/* ניתוב לעמוד ניהול משתמשים */}
+            <Route path="/" element={<StudyWord />} /> {/* ניתוב ברירת מחדל לעמוד הקורסים */}
+            <Route path="/lessons/level/:level" element={<CourseComponent />} />
+            <Route path="/users" element={<UserManagementComponent />} /> {/* ניתוב לעמוד ניהול משתמשים */}
           </Routes>
         </div>
       </Router>

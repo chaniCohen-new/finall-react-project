@@ -1,46 +1,80 @@
 import React, { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    IconButton,
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
-const WordTable = () => {
+const WordsTable = () => {
     const [words, setWords] = useState([]);
 
-    useEffect(() => {
-        const fetchWords = async () => {
-            try {
-                const response = await fetch('YOUR_API_URL_HERE'); // הכנס את URL ה-API שלך כאן
-                const data = await response.json();
-                setWords(data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
+    // פונקציה לקבלת המילים מהשרת
+    const fetchWords = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/words');
+            setWords(response.data);
+        } catch (error) {
+            console.error("Error fetching words:", error);
+        }
+    };
 
+    useEffect(() => {
         fetchWords();
     }, []);
 
-    return (
-        <div className="container text-center mt-5">
-            <h2 className="mb-4">Words from Server</h2>
-            <div className="table-responsive">
-                <table className="table table-bordered table-striped">
-                    <thead className="thead-dark">
-                        <tr>
-                            <th>ID</th>
-                            <th>Word</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {words.map((word, index) => (
-                            <tr key={index}>
-                                <td>{index + 1}</td>
-                                <td>{word}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    );
-}
+    const handleDelete = (id) => {
+        // הוספת הלוגיקה למחיקת המילה
+        console.log("Delete word with ID:", id);
+    };
 
-export default WordTable;
+    const handleEdit = (id) => {
+        // הוספת הלוגיקה לעריכת המילה
+        console.log("Edit word with ID:", id);
+    };
+
+    return (
+        <TableContainer>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell style={{ fontWeight: 'bold', paddingLeft: '60px' }}>מילה</TableCell> {/* הזזה ימינה */}
+                        <TableCell style={{ fontWeight: 'bold', paddingLeft: '10px' }}>תרגום</TableCell>
+                        <TableCell style={{ fontWeight: 'bold', paddingLeft: '10px' }}>תמונה</TableCell>
+                        <TableCell style={{ fontWeight: 'bold', paddingLeft: '10px' }}>עריכה</TableCell>
+                        <TableCell style={{ fontWeight: 'bold', paddingLeft: '10px' }}>מחיקה</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {words.map((word) => (
+                        <TableRow key={word._id}>
+                            <TableCell style={{ paddingLeft: '60px' }}>{word.word}</TableCell> {/* גם כאן לזוז ימינה */}
+                            <TableCell style={{ paddingLeft: '10px' }}>{word.translating}</TableCell>
+                            <TableCell style={{ paddingLeft: '10px' }}>
+                                <img src={word.Img} alt={word.word} style={{ width: '50px', height: 'auto' }} />
+                            </TableCell>
+                            <TableCell style={{ paddingLeft: '10px' }}>
+                                <IconButton onClick={() => handleEdit(word._id)} aria-label="edit">
+                                    <EditIcon />
+                                </IconButton>
+                            </TableCell>
+                            <TableCell style={{ paddingLeft: '10px' }}>
+                                <IconButton onClick={() => handleDelete(word._id)} aria-label="delete">
+                                    <DeleteIcon />
+                                </IconButton>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    );
+};
+
+export default WordsTable;
