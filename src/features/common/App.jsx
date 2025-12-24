@@ -7,25 +7,26 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import UserManagementComponent from '../user/ManagmentComponent';
 import StudyWord from '../word/StudyWord';
 import QuizComponent from '../test/test';
-import Home from './home';
 import CourseComponent from '../lesson/lessonLogin';
-import MenuComponent from './home';
+import MenuComponent from './Menu';
 import LevelSelection from '../lesson/LevelSelection';
+import MenuAdminComponent from './MenuAdmin';
 
 
 function App() {
   return (
     <>
-      {/* <UserManagementComponent /> */}
-
       <Router>
         <div className="App">
+          <MenuComponent />
           <Routes>
-            <Route path="/login" element={<AuthLogin />} />
+            <Route path="/" element={<UserManagementComponent />} />
             <Route path="/register" element={<AuthRegister />} />
-            <Route path="/" element={<StudyWord />} /> {/* ניתוב ברירת מחדל לעמוד הקורסים */}
+            <Route path="/words/:category" element={<StudyWord />} />
             <Route path="/lessons/level/:level" element={<CourseComponent />} />
+            <Route path="/lessons" element={<LevelSelection />} />
             <Route path="/users" element={<UserManagementComponent />} /> {/* ניתוב לעמוד ניהול משתמשים */}
+            <Route path="/quiz" element={<QuizComponent />} />
           </Routes>
         </div>
       </Router>

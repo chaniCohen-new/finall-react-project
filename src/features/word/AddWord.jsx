@@ -8,7 +8,7 @@ import {
     TextField,
     Button
 } from '@mui/material';
-import axios from 'axios';
+import { addWord } from './wordService'; // הייבוא הנדרש
 
 const AddWordDialog = ({ open, onClose, onWordAdded }) => {
     const [newWord, setNewWord] = useState({ word: '', translating: '', lesson: '', image: null });
@@ -23,25 +23,14 @@ const AddWordDialog = ({ open, onClose, onWordAdded }) => {
     };
 
     const handleAddWord = async () => {
-        const formData = new FormData();
-        formData.append('word', newWord.word);
-        formData.append('translating', newWord.translating);
-        formData.append('lesson', newWord.lesson);
-        if (newWord.image) formData.append('image', newWord.image);
-
         try {
-            const response = await axios.post('http://localhost:5000/words/', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            onWordAdded(response.data); // החזרת המילה החדשה להורה
+            const response = await addWord(newWord); // קריאה לפונקציה ממחלקת ה-API
+            onWordAdded(response); // החזרת המילה החדשה להורה
             onClose(); // סגירת הדיאלוג
         } catch (error) {
             console.error("Error adding word:", error);
         }
     };
-    
 
     return (
         <Dialog open={open} onClose={onClose}>

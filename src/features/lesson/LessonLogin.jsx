@@ -6,6 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 const CourseComponent = () => {
   const [lessons, setLessons] = useState([]);
   const { level } = useParams(); // קבלת רמת השיעורים מה-URL
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log("Current level:", level); // לוג לרמת השיעורים
@@ -19,18 +20,16 @@ const CourseComponent = () => {
       });
   }, [level]); // הוסף את level כתלות
 
-  const navigate = useNavigate();
+  const handleStartClick = () => {
+    navigate(`/lessons`); // נווט לדף השיעור
+  };
 
-  const handleLogout = () => {
-      navigate(-1); // עובר אחורה בדפדפן
+  const handlePracticeClick = () => {
+    navigate(`/quiz`); // נווט לדף התרגול
   };
 
   return (
     <div className="container mt-5">
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <a className="navbar-brand" href="#">מערכת ניהול קורסים</a>
-        <button className="btn btn-danger" onClick={handleLogout}>יציאה</button>
-      </nav>
 
       <h2 className="mt-4">נושאים ללימוד</h2>
       <div className="list-group mt-3">
@@ -38,8 +37,19 @@ const CourseComponent = () => {
                 <div className="list-group-item" key={index}>
                     <h4>{lesson.category}</h4>
                     <h5>{lesson.level}</h5>
-            <button className="btn btn-primary mr-2">בואו נתחיל</button>
-            <button className="btn btn-secondary">בואו נתרגל</button>
+                    <button 
+              className="btn btn-primary mr-2" 
+              onClick={() => handleStartClick()} // העבר את ה-ID של השיעור
+            >
+              בואו נתחיל
+            </button>
+            <button 
+              className="btn btn-secondary" 
+              onClick={() => handlePracticeClick()} // העבר את ה-ID של השיעור
+            >
+              בואו נתרגל
+            </button>
+
           </div>
         ))}
       </div>

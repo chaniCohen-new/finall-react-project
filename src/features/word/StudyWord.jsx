@@ -107,9 +107,9 @@ const WordsTable = () => {
                 </Button>
             </Box>
             <Box textAlign="center" marginBottom="20px">
-                <Button 
-                    variant="contained" 
-                    onClick={handleAddWordOpen} 
+                <Button
+                    variant="contained"
+                    onClick={handleAddWordOpen}
                     style={{ backgroundColor: '#E3F2FD', color: '#000' }} // צבע תכלת
                 >
                     הוסף מילה לשיעור
@@ -119,31 +119,31 @@ const WordsTable = () => {
                 <Table>
                     <TableHead style={{ backgroundColor: '#f5f5f5' }}>
                         <TableRow>
-                            <TableCell style={{ fontWeight: 'bold', paddingLeft: '60px' }}>מילה</TableCell>
-                            <TableCell style={{ fontWeight: 'bold', paddingLeft: '10px' }}>תרגום</TableCell>
-                            <TableCell style={{ fontWeight: 'bold', paddingLeft: '10px' }}>תמונה</TableCell>
-                            <TableCell style={{ fontWeight: 'bold', paddingLeft: '10px' }}>עריכה</TableCell>
-                            <TableCell style={{ fontWeight: 'bold', paddingLeft: '10px' }}>מחיקה</TableCell>
+                            <TableCell style={{ fontWeight: 'bold', textAlign: 'center' }}>מילה</TableCell>
+                            <TableCell style={{ fontWeight: 'bold', textAlign: 'center' }}>תרגום</TableCell>
+                            <TableCell style={{ fontWeight: 'bold', textAlign: 'center', width: '200px' }}>תמונה</TableCell>
+                            <TableCell style={{ fontWeight: 'bold', textAlign: 'center' }}></TableCell>
+                            <TableCell style={{ fontWeight: 'bold', textAlign: 'center' }}></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {words.slice(page * itemsPerPage, (page + 1) * itemsPerPage).map((word) => (
                             <TableRow key={word._id}>
-                                <TableCell style={{ paddingLeft: '60px' }}>{word.word}</TableCell>
-                                <TableCell style={{ paddingLeft: '10px' }}>{word.translating}</TableCell>
-                                <TableCell style={{ paddingLeft: '10px' }}>
+                                <TableCell style={{ textAlign: 'center' }}>{word.word}</TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>{word.translating}</TableCell>
+                                <TableCell style={{ textAlign: 'center', padding: '20px' }}>
                                     <img
                                         src={word.imageUrl}
                                         alt={word.word}
-                                        style={{ width: '100px', height: 'auto', borderRadius: '5px' }}
+                                        style={{ width: '150px', height: 'auto', borderRadius: '5px' }} // הגדלת רוחב התמונה
                                     />
                                 </TableCell>
-                                <TableCell style={{ paddingLeft: '10px' }}>
+                                <TableCell style={{ textAlign: 'right', padding: '10px' }}>
                                     <IconButton onClick={() => handleEdit(word)} aria-label="edit" style={{ backgroundColor: '#E3F2FD', margin: '5px' }}>
                                         <EditIcon />
                                     </IconButton>
                                 </TableCell>
-                                <TableCell style={{ paddingLeft: '10px' }}>
+                                <TableCell style={{ textAlign: 'right', padding: '10px' }}>
                                     <IconButton onClick={() => handleDelete(word._id)} aria-label="delete" style={{ backgroundColor: '#E3F2FD', margin: '5px' }}>
                                         <DeleteIcon />
                                     </IconButton>
@@ -155,10 +155,10 @@ const WordsTable = () => {
             </TableContainer>
 
             {/* דיאלוג להוספת מילה */}
-            <AddWordDialog 
-                open={openDialog} 
-                onClose={handleAddWordClose} 
-                onWordAdded={handleWordAdded} 
+            <AddWordDialog
+                open={openDialog}
+                onClose={handleAddWordClose}
+                onWordAdded={handleWordAdded}
                 editWord={editingWord} // העברת המילה לעריכה אם קיימת
                 onWordUpdated={handleUpdateWord} // מעביר פונקציה לעדכון מילה
             />
