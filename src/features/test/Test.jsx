@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useParams } from 'react-router-dom';
 import {
     Button,
     Card,
@@ -13,22 +14,29 @@ import {
     Typography,
 } from '@mui/material';
 
-const QuizComponent = () => {
+const QuizComponent = () => { // קבלת lessonId כפרמטר
     const [questionData, setQuestionData] = useState(null);
     const [selectedOption, setSelectedOption] = useState('');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [questions, setQuestions] = useState([]);
 
+    const { lessonId } = useParams(); // קבלת ה-lessonId מה-URL
+    console.log("lessonId:", lessonId); // לוג לוודא שה-lessonId מוגדר
+
     // פונקציה לקבלת השאלות מהשרת
-    const fetchQuestions = async () => {
-        try {
-            const response = await axios.get('http://localhost:5000/questions/lesson/694137ccac16495d2693ad29'); // ודא שזה ה-URL הנכון
-            setQuestions(response.data); // שמירת כל השאלות במערך
-            setQuestionData(response.data[0]); // הצגת השאלה הראשונה
-        } catch (error) {
-            console.error("Error fetching questions:", error);
-        }
-    };
+    useEffect(() => {
+        const fetchQuestions = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/questions/lesson/${lessonId}`);
+                setQuestions(response.data);
+            } catch (error) {
+                console.error("Error fetching questions:", error);
+            }
+        };
+
+        fetchQuestions();
+    }, [lessonId]);
+
 
     const handleOptionChange = (event) => {
         setSelectedOption(event.target.value);
@@ -47,9 +55,11 @@ const QuizComponent = () => {
         }
     };
 
-    useEffect(() => {
-        fetchQuestions();
-    }, []);
+    // useEffect(() => {
+    //     if (lessonId) { // בדוק אם lessonId קיים
+    //         fetchQuestions();
+    //     }
+    // }, [lessonId]);
 
     return (
         <Container>

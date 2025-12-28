@@ -11,8 +11,8 @@ const CourseComponent = () => {
   useEffect(() => {
     console.log("Current level:", level); // לוג לרמת השיעורים
     axios.get(`http://localhost:5000/lessons/level/level ${level}`)
-    .then(response => {
-        console.log(response.data); // הוסף שורה זו
+      .then(response => {
+        console.log(response.data); // לוג כדי לבדוק את הנתונים
         setLessons(response.data); // הנח שהנתונים חוזרים כארראי של אובייקטים
       })
       .catch(error => {
@@ -20,36 +20,37 @@ const CourseComponent = () => {
       });
   }, [level]); // הוסף את level כתלות
 
-  const handleStartClick = () => {
-    navigate(`/lessons`); // נווט לדף השיעור
+  const handleStartClick = (lessonId) => {
+    // נווט לדף השיעור עם ה-ID של השיעור
+    navigate(`/words/${lessonId}`); 
   };
 
-  const handlePracticeClick = () => {
-    navigate(`/quiz`); // נווט לדף התרגול
+  const handlePracticeClick = (lessonId) => {
+    // נווט לדף המבחן עם ID של השיעור
+    navigate(`/quiz/${lessonId}`);
   };
 
   return (
     <div className="container mt-5">
-
       <h2 className="mt-4">נושאים ללימוד</h2>
       <div className="list-group mt-3">
-      {lessons.map((lesson, index) => (
-                <div className="list-group-item" key={index}>
-                    <h4>{lesson.category}</h4>
-                    <h5>{lesson.level}</h5>
-                    <button 
+        {lessons.map((lesson) => (
+          <div className="list-group-item" key={lesson._id}>
+            {/* השתמש ב-ID הייחודי של השיעור */}
+            <h4>{lesson.category}</h4>
+            <h5>{lesson.level}</h5>
+            <button 
               className="btn btn-primary mr-2" 
-              onClick={() => handleStartClick()} // העבר את ה-ID של השיעור
+              onClick={() => handleStartClick(lesson._id)} // העבר את ה-ID של השיעור
             >
               בואו נתחיל
             </button>
             <button 
               className="btn btn-secondary" 
-              onClick={() => handlePracticeClick()} // העבר את ה-ID של השיעור
+              onClick={() => handlePracticeClick(lesson._id)} // העבר את ה-ID של השיעור
             >
               בואו נתרגל
             </button>
-
           </div>
         ))}
       </div>

@@ -4,13 +4,14 @@ import AuthLogin from '../auth/login'
 import AuthRegister from '../auth/register'
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import UserManagementComponent from '../user/ManagmentComponent';
+import UserManagementComponent from '../userByManager/ManagmentComponent';
 import StudyWord from '../word/StudyWord';
 import QuizComponent from '../test/test';
 import CourseComponent from '../lesson/lessonLogin';
 import MenuComponent from './Menu';
 import LevelSelection from '../lesson/LevelSelection';
 import MenuAdminComponent from './MenuAdmin';
+import UserExams from '../user/profile';
 
 
 function App() {
@@ -22,12 +23,13 @@ function App() {
           <Routes>
             <Route path="/" element={<UserManagementComponent />} />
             <Route path="/register" element={<AuthRegister />} />
-            <Route path="/words/:category" element={<StudyWord />} />
+            <Route path="/words/:lessonId" element={<StudyWord />} />
             <Route path="/lessons/level/:level" element={<CourseComponent />} />
             <Route path="/lessons" element={<LevelSelection />} />
             <Route path="/users" element={<UserManagementComponent />} /> {/* ניתוב לעמוד ניהול משתמשים */}
-            <Route path="/quiz" element={<QuizComponent />} />
-          </Routes>
+            <Route path="/quiz/:lessonId" element={<QuizComponent />} /> {/* הנתיב המיועד למבחן */}
+            <Route path="/profile" element={<UserExams />} />
+            </Routes>
         </div>
       </Router>
 

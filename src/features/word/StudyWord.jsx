@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import {
     Table,
@@ -22,23 +23,42 @@ import { addWord, deleteWord, updateWord } from './wordService'; // ייבוא �
 
 const WordsTable = () => {
     const [words, setWords] = useState([]);
+    const { lessonId } = useParams(); // קבלת ה-ID של השיעור מה-URL
     const [page, setPage] = useState(0);
     const itemsPerPage = 2;
     const [openDialog, setOpenDialog] = useState(false);
     const [editingWord, setEditingWord] = useState(null);
 
-    const fetchWords = async () => {
-        try {
-            const response = await axios.get('http://localhost:5000/words');
-            setWords(response.data);
-        } catch (error) {
-            console.error("Error fetching words:", error);
-        }
-    };
-
     useEffect(() => {
+        console.log("Current lesson ID:", lessonId); // בדוק אם ה-lessonId מתקבל
+        
+        const fetchWords = async () => {
+            if (!lessonId) {
+                console.error("No lesson ID provided!");
+                return;
+            }
+
+            try {
+                const response = await axios.get(`http://localhost:5000/words/lesson/${lessonId}`);
+                console.log("Fetched words data:", response.data);
+                
+                // ודא שהנתונים הם מערך
+                if (Array.isArray(response.data)) {
+                    setWords(response.data); // יש להגדיר כ-array
+                } else {
+                    console.error("Words data is not an array:", response.data);
+                    setWords([]); // התמודד עם מקרה שבו זה לא מערך
+                }
+            } catch (error) {
+                console.error("Error fetching words:", error);
+            }
+
+        };
+
         fetchWords();
-    }, []);
+    }, [lessonId]);
+
+
 
     const handleDelete = async (id) => {
         if (window.confirm("האם אתה בטוח שברצונך למחוק את המילה הזו?")) {

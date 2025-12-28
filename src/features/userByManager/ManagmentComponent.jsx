@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchUsers, handleAddUser, deleteUser } from './service.js'; // ודא שהנתיב נכון
-import AddUserModal from './AddUserModal';
+import AddUserModal from './AddUserModal.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const UserManagementComponent = () => {
