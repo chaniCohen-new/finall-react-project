@@ -9,6 +9,7 @@ const UserManagementComponent = () => {
     const [error, setError] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showModal, setShowModal] = useState(false);
+    const token = localStorage.getItem('token'); // ודא שה-token מוגדר כאן
 
     useEffect(() => {
         const loadUsers = async () => {
@@ -36,13 +37,13 @@ const UserManagementComponent = () => {
 
     const handleDelete = async (userId) => {
         try {
-            await deleteUser(userId); // פנה ל-API למחוק את המשתמש
+            await deleteUser(userId, token); // העבר את ה-token כאן
             setUsers(prevUsers => prevUsers.filter(user => user._id !== userId)); // עדכון המצב
         } catch (error) {
             console.error('שגיאה במחיקת המשתמש:', error.message); // הדפס שגיאה לקונסול
         }
     };
-    
+
     const filteredUsers = users.filter(user =>
         user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
         user.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -81,14 +82,14 @@ const UserManagementComponent = () => {
                     <tbody>
                         {filteredUsers.length > 0 ? (
                             filteredUsers.map((user) => (
-                                <tr key={user._id}> {/* השתמש ב-_id כאן */}
+                                <tr key={user._id}>
                                     <td>{user.username}</td>
                                     <td>{user.email}</td>
                                     <td>{user.role}</td>
                                     <td>
                                         <button className="btn btn-warning btn-sm mr-2">✏️ עריכה</button>
-                                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(user._id)}>🗑️ מחיקה</button> {/*  השתמש ב-_id כאן */}
-                                        </td>
+                                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(user._id)}>🗑️ מחיקה</button>
+                                    </td>
                                 </tr>
                             ))
                         ) : (

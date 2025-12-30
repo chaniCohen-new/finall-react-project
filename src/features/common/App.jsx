@@ -21,7 +21,7 @@ function App() {
         <div className="App">
           <MenuComponent />
           <Routes>
-            <Route path="/" element={<UserManagementComponent />} />
+            <Route path="/" element={<AuthLogin />} />
             <Route path="/register" element={<AuthRegister />} />
             <Route path="/words/:lessonId" element={<StudyWord />} />
             <Route path="/lessons/level/:level" element={<CourseComponent />} />

@@ -1,11 +1,12 @@
 import axios from "axios";
 const API_URL = 'http://localhost:5000/';
+const token = localStorage.getItem('token')
 
 export const fetchUsers = async () => {
     try {
         const response = await axios.get(`${API_URL}users`, {
             headers: {
-                'Cache-Control': 'no-cache'
+                'Authorization':`Bearer ${token}`
             }
         }); return response.data; // החזרת הנתונים
     } catch (error) {
@@ -21,7 +22,7 @@ export const handleAddUser = async ({ username, password, email, phone, role }) 
             { username, password, email, phone, role },
             {
                 headers: {
-                    'Cache-Control': 'no-cache'
+                    'Authorization':`Bearer ${token}`
                 }
             }
         );
@@ -39,9 +40,13 @@ export const handleAddUser = async ({ username, password, email, phone, role }) 
     }
 };
 
-export const deleteUser = async (userId) => {
+export const deleteUser = async (userId, token) => {
     try {
-        const response = await axios.delete(`${API_URL}users/${userId}`);
+        const response = await axios.delete(`${API_URL}users/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         return response.data;
     } catch (error) {
         throw new Error(error.response?.data || 'מחיקה נכשלה');

@@ -17,6 +17,7 @@ const AuthLogin = () => {
         try {
             const data = await loginUser(username, password);
             localStorage.setItem('token', data.token);
+            console.log('kept token');
             dispatch(setToken({ token: data.token, user: data.user }));
             dispatch(setMessage(data.message));
             
