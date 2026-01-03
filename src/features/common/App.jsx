@@ -19,8 +19,9 @@ function App() {
     <>
       <Router>
         <div className="App">
-          <MenuComponent />
+          {/* <MenuComponent /> */}
           <Routes>
+            <Route path="/admin" element={<MenuAdminComponent />} />
             <Route path="/" element={<AuthLogin />} />
             <Route path="/register" element={<AuthRegister />} />
             <Route path="/words/:lessonId" element={<StudyWord />} />
@@ -29,7 +30,7 @@ function App() {
             <Route path="/users" element={<UserManagementComponent />} /> {/* ניתוב לעמוד ניהול משתמשים */}
             <Route path="/quiz/:lessonId" element={<QuizComponent />} /> {/* הנתיב המיועד למבחן */}
             <Route path="/profile" element={<UserExams />} />
-            </Routes>
+          </Routes>
         </div>
       </Router>
 

@@ -31,7 +31,7 @@ const WordsTable = () => {
 
     useEffect(() => {
         console.log("Current lesson ID:", lessonId); // בדוק אם ה-lessonId מתקבל
-        
+
         const fetchWords = async () => {
             if (!lessonId) {
                 console.error("No lesson ID provided!");
@@ -41,7 +41,7 @@ const WordsTable = () => {
             try {
                 const response = await axios.get(`http://localhost:5000/words/lesson/${lessonId}`);
                 console.log("Fetched words data:", response.data);
-                
+
                 // ודא שהנתונים הם מערך
                 if (Array.isArray(response.data)) {
                     setWords(response.data); // יש להגדיר כ-array
@@ -147,29 +147,36 @@ const WordsTable = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {words.slice(page * itemsPerPage, (page + 1) * itemsPerPage).map((word) => (
-                            <TableRow key={word._id}>
-                                <TableCell style={{ textAlign: 'center' }}>{word.word}</TableCell>
-                                <TableCell style={{ textAlign: 'center' }}>{word.translating}</TableCell>
-                                <TableCell style={{ textAlign: 'center', padding: '20px' }}>
-                                    <img
-                                        src={word.imageUrl}
-                                        alt={word.word}
-                                        style={{ width: '150px', height: 'auto', borderRadius: '5px' }} // הגדלת רוחב התמונה
-                                    />
-                                </TableCell>
-                                <TableCell style={{ textAlign: 'right', padding: '10px' }}>
-                                    <IconButton onClick={() => handleEdit(word)} aria-label="edit" style={{ backgroundColor: '#E3F2FD', margin: '5px' }}>
-                                        <EditIcon />
-                                    </IconButton>
-                                </TableCell>
-                                <TableCell style={{ textAlign: 'right', padding: '10px' }}>
-                                    <IconButton onClick={() => handleDelete(word._id)} aria-label="delete" style={{ backgroundColor: '#E3F2FD', margin: '5px' }}>
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                        {words.slice(page * itemsPerPage, (page + 1) * itemsPerPage).map((word) => {
+                            const category = word.lesson ? word.lesson.category : 'defaultCategory';
+                            const imageUrl = `http://localhost:5000/images/${category}/${word.Img}`;
+
+                            console.log(imageUrl); // בדוק מה יוצא כאן
+
+                            return (
+                                <TableRow key={word._id}>
+                                    <TableCell style={{ textAlign: 'center' }}>{word.word}</TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}>{word.translating}</TableCell>
+                                    <TableCell style={{ textAlign: 'center', padding: '20px' }}>
+                                        <img
+                                            src={imageUrl} // כעת imageUrl עשוי כראוי
+                                            alt={word.word}
+                                            style={{ width: '150px', height: 'auto', borderRadius: '5px' }}
+                                        />
+                                    </TableCell>
+                                    <TableCell style={{ textAlign: 'right', padding: '10px' }}>
+                                        <IconButton onClick={() => handleEdit(word)} aria-label="edit" style={{ backgroundColor: '#E3F2FD', margin: '5px' }}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </TableCell>
+                                    <TableCell style={{ textAlign: 'right', padding: '10px' }}>
+                                        <IconButton onClick={() => handleDelete(word._id)} aria-label="delete" style={{ backgroundColor: '#E3F2FD', margin: '5px' }}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
                     </TableBody>
                 </Table>
             </TableContainer>

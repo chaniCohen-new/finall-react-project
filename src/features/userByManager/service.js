@@ -15,30 +15,6 @@ export const fetchUsers = async () => {
     }
 };
 
-export const handleAddUser = async ({ username, password, email, phone, role }) => {
-    try {
-        const response = await axios.post(
-            `${API_URL}users`,
-            { username, password, email, phone, role },
-            {
-                headers: {
-                    'Authorization':`Bearer ${token}`
-                }
-            }
-        );
-
-
-        console.log('Response:', response.data); // הדפסת התגובה
-        alert(response.data.message);  // מראה הודעה להצלחה
-    } catch (error) {
-        console.error('Error:', error); // פרטי השגיאה
-        if (error.response) {
-            alert(error.response.data.message);
-        } else {
-            alert('An unexpected error occurred.');
-        }
-    }
-};
 
 export const deleteUser = async (userId, token) => {
     try {

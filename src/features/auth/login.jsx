@@ -3,6 +3,7 @@ import { loginUser } from './service.js';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setToken, setError, setMessage } from './authSlice.js';
+import { jwtDecode } from 'jwt-decode';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const AuthLogin = () => {
@@ -20,12 +21,26 @@ const AuthLogin = () => {
             console.log('kept token');
             dispatch(setToken({ token: data.token, user: data.user }));
             dispatch(setMessage(data.message));
-            
-            navigate('../users');
+
+            // Decode the token to find user role
+            const userDecoded = jwtDecode(data.token);
+            const userRole = userDecoded.role;
+
+            // Navigate to the appropriate section based on the user role
+            if (userRole === 'admin') {
+                // navigate('../admin-dashboard'); // דף המנהל
+                navigate('/admin')
+            } else if (userRole === 'user') {
+                navigate('../common/Menu')
+                navigate('/lessons'); // דף המשתמש
+            } else {
+                navigate('../'); // דף הבית או עמוד ברירת מחדל
+            }
         } catch (err) {
             dispatch(setError(err.response ? err.response.data.message : 'Login failed'));
         }
     };
+
 
     return (
         <div className="container mt-5">

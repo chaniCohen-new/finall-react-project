@@ -19,7 +19,7 @@ const MenuAdminComponent = () => {
     };
 
     const handleLearningClick = () => {
-        navigate('/learning'); // ניווט לדף הלמידה
+        navigate('/lessons'); // ניווט לדף הלמידה
     };
 
     const handleUsersClick = () => {

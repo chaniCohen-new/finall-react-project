@@ -1,110 +1,109 @@
-import React, { useEffect, useState } from 'react';
-import { fetchUsers, handleAddUser, deleteUser } from './service.js'; // ודא שהנתיב נכון
-import AddUserModal from './AddUserModal.jsx';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from 'react';
+import { Modal } from 'react-bootstrap';
+import axios from 'axios';
 
-const UserManagementComponent = () => {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
+const API_URL = 'http://localhost:5000/'; // ודא שה-API_URL נכון
+
+const AddUserModal = ({ show, handleClose, refreshUsers }) => {
+    const [newUserData, setNewUserData] = useState({ username: '', password: '', email: '', phone: '', role: '' });
     const [error, setError] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [showModal, setShowModal] = useState(false);
-    const token = localStorage.getItem('token'); // ודא שה-token מוגדר כאן
 
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const usersData = await fetchUsers();
-                setUsers(usersData); // עדכון מצב המשתמשים
-            } catch (err) {
-                setError('שגיאה בטעינת משתמשים'); // עדכון מצב השגיאה
-            } finally {
-                setLoading(false); // סיום הטעינה
-            }
-        };
-
-        loadUsers(); // קריאה לפונקציה
-    }, []);
-
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setNewUserData(prevState => ({ ...prevState, [name]: value }));
     };
 
-    const refreshUsers = async () => {
-        const usersData = await fetchUsers();
-        setUsers(usersData);
-    };
-
-    const handleDelete = async (userId) => {
+    const handleAddUser = async ({ username, password, email, phone, role }) => {
+        const token = localStorage.getItem('token'); // קבל את הטוקן
+        console.log(`username: ${username}, password: ${password}, email: ${email}, phone: ${phone}, role: ${role}`);
         try {
-            await deleteUser(userId, token); // העבר את ה-token כאן
-            setUsers(prevUsers => prevUsers.filter(user => user._id !== userId)); // עדכון המצב
+            const response = await axios.post(
+                `${API_URL}users`,
+                { username, password, email, phone, role },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            console.log('Response:', response.data); // הדפסת התגובה
+            alert(response.data.message); // מראה הודעה להצלחה
         } catch (error) {
-            console.error('שגיאה במחיקת המשתמש:', error.message); // הדפס שגיאה לקונסול
+            console.error('Error:', error); // פרטי השגיאה
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert('An unexpected error occurred.');
+            }
         }
     };
 
-    const filteredUsers = users.filter(user =>
-        user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const handleSubmit = async () => {
+        const { username, password, email, phone, role } = newUserData;
+        if (!username || !password || !email || !phone || !role) {
+            alert('נא למלא את כל השדות.'); // הודעה אם חסרים פרטים
+            return;
+        }
+
+        try {
+            await handleAddUser({ username, password, email, phone, role }); // שליחה של המידע המלא
+            handleClose(); // סגירת המודאל
+            refreshUsers(); // רענון הרשימה
+        } catch (error) {
+            setError(error.message); // להציג שגיאה אם יש
+        }
+    };
 
     return (
-        <div className="container mt-4" style={{ direction: 'ltr', textAlign: 'left' }}>
-            <header className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="text-center">ניהול משתמשים</h2>
-                <button className="btn btn-primary" onClick={() => setShowModal(true)}>הוסף משתמש</button>
-            </header>
-
-            <div className="mb-4">
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>הוסף משתמש חדש</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {error && <div className="text-danger">{error}</div>}
                 <input
                     type="text"
-                    className="form-control"
-                    placeholder="חפש משתמשים..."
-                    value={searchQuery}
-                    onChange={handleSearchChange}
+                    name="username"
+                    placeholder="שם משתמש"
+                    onChange={handleInputChange}
+                    className="form-control mb-2"
                 />
-            </div>
-
-            {loading && <div>טוען...</div>}
-            {error && <div className="text-danger">{error}</div>}
-
-            <div className="table-responsive mb-4">
-                <table className="table table-striped table-bordered shadow">
-                    <thead className="thead-dark">
-                        <tr>
-                            <th>שם משתמש</th>
-                            <th className="text-center" style={{ minWidth: '100px' }}>אימייל</th>
-                            <th>תפקיד</th>
-                            <th className="text-center" style={{ minWidth: '50px' }}>פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredUsers.length > 0 ? (
-                            filteredUsers.map((user) => (
-                                <tr key={user._id}>
-                                    <td>{user.username}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.role}</td>
-                                    <td>
-                                        <button className="btn btn-warning btn-sm mr-2">✏️ עריכה</button>
-                                        <button className="btn btn-danger btn-sm" onClick={() => handleDelete(user._id)}>🗑️ מחיקה</button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="4" className="text-center">לא נמצאו משתמשים</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* מודאל להזנת פרטי המשתמש החדש */}
-            <AddUserModal show={showModal} handleClose={() => setShowModal(false)} refreshUsers={refreshUsers} />
-        </div>
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="סיסמה"
+                    onChange={handleInputChange}
+                    className="form-control mb-2"
+                />
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="אימייל"
+                    onChange={handleInputChange}
+                    className="form-control mb-2"
+                />
+                <input
+                    type="text"
+                    name="phone"
+                    placeholder="טלפון"
+                    onChange={handleInputChange}
+                    className="form-control mb-2"
+                />
+                <input
+                    type="text"
+                    name="role"
+                    placeholder="תפקיד"
+                    onChange={handleInputChange}
+                    className="form-control mb-2"
+                />
+            </Modal.Body>
+            <Modal.Footer>
+                <button className="btn btn-secondary" onClick={handleClose}>סגור</button>
+                <button className="btn btn-primary" onClick={handleSubmit}>הוסף משתמש</button>
+            </Modal.Footer>
+        </Modal>
     );
 };
 
-export default UserManagementComponent;
+export default AddUserModal;

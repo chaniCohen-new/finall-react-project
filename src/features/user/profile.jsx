@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import useAuth from '../auth/useAuth';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 const UserExams = ({ userId }) => {
     const [exams, setExams] = useState([]);
-    const [userName, setUserName] = useState('');
+    // const [userName, setUserName] = useState('');
+
+    const { username } = useAuth();
 
     useEffect(() => {
         const fetchExams = async () => {
@@ -23,7 +26,7 @@ const UserExams = ({ userId }) => {
     return (
         <Container>
             <Typography variant="h4" color="primary" gutterBottom>
-                Hi {userName}!
+                Hi {username}!
             </Typography>
             <TableContainer component={Paper}>
                 <Table>
