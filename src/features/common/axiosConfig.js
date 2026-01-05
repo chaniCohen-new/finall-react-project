@@ -1,12 +1,7 @@
 import axios from "axios";
 
-// axios.create - פונקציה שיוצרת מופע לאקסיוס עם הגדרות ברירת מחדל לכל הבקשות
-const instance = axios.create({ baseURL: 'https://dummyjson.com' });
+const instance = axios.create({ baseURL: 'http://localhost:5000' });
 
-// interceptor - מיירט - כמו מידלוואר של השרת
-
-// לפני שליחת הבקשה
-// בכל הבקשות נשלח את הטוקן אם קיים
 instance.interceptors.request.use((value) => {
     if (localStorage.myToken) {
         value.headers.Authorization = `Bearer ${localStorage.myToken}`;
@@ -15,7 +10,6 @@ instance.interceptors.request.use((value) => {
 });
 
 
-// אחרי שחזרה התגובה - אם יש שגיאה הציג אלרט
 instance.interceptors.response.use(
     (response) => {
         // For successful responses, simply return the response

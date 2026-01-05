@@ -21,13 +21,13 @@ const QuizComponent = () => {
     const [questions, setQuestions] = useState([]);
     const [score, setScore] = useState(0);
 
-    const { lessonId } = useParams();
+    const { lessonId } = useParams(); // קח את ה-ID מה-URL
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/questions/lesson/${lessonId}`);
+                const response = await axios.get(`http://localhost:5000/questions/lesson/${lessonId}`); // בקר בשרת לקבלת השאלות לפי ID של השיעור
                 setQuestions(response.data);
                 setQuestionData(response.data.length > 0 ? response.data[0] : null); // הגדרת השאלה הראשונה אם קיימות שאלות
             } catch (error) {
@@ -43,7 +43,7 @@ const QuizComponent = () => {
     };
 
     const handleSubmit = async () => {
-        if (selectedOption === questionData.correctAnswer) {
+        if (selectedOption === questionData.answer) { // השווה עם התשובה הנכונה
             setScore(score + 1);
         }
 
@@ -54,14 +54,14 @@ const QuizComponent = () => {
             setSelectedOption('');
         } else {
             await saveExam();
-            navigate('/results');
+            navigate('/results'); // עובר לדף התוצאות
         }
     };
 
     const saveExam = async () => {
         const examData = {
             mark: score,
-            lesson: lessonId,
+            lesson: lessonId, // דאג שה-ID של השיעור יישמר
         };
 
         try {
@@ -88,16 +88,14 @@ const QuizComponent = () => {
                             <CardContent>
                                 <Typography variant="h5">{questionData.question}</Typography>
                                 <FormControl component="fieldset">
-                                    <RadioGroup
-                                        value={selectedOption}
-                                        onChange={handleOptionChange}
-                                    >
+                                    <RadioGroup value={selectedOption} onChange={handleOptionChange}>
+                                        {/* כל תשובה במערך optional מופיעה כאן */}
                                         {questionData.optional.map((option, index) => (
                                             <FormControlLabel
                                                 key={index}
                                                 value={option}
                                                 control={<Radio />}
-                                                label={option}
+                                                label={option} // התווית עבור התשובה
                                             />
                                         ))}
                                     </RadioGroup>
