@@ -1,4 +1,5 @@
 import axios from 'axios';
+const token = localStorage.getItem('token')
 
 // פונקציה להוספת מילה
 export const addWord = async (newWord) => {
@@ -46,6 +47,7 @@ export const updateWord = async (wordId, updatedWord) => {
         const response = await axios.put(`http://localhost:5000/words/${wordId}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}` 
             },
         });
         return response.data; // החזרת המילה המעודכנת

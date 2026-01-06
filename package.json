@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@hookform/resolvers": "^5.2.2",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@reduxjs/toolkit": "^2.11.0",
@@ -24,11 +25,14 @@
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.0",
+    "react-hook-form": "^7.70.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.10.1",
     "redux-thunk": "^3.1.0",
+    "resolvers": "^1.0.0",
     "styled-components": "^6.1.19",
-    "toolkit": "^1.5.4"
+    "toolkit": "^1.5.4",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

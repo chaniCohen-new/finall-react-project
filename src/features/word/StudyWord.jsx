@@ -145,7 +145,7 @@ const WordsTable = () => {
                                 <TableCell style={{ textAlign: 'center', padding: '20px' }}>
                                     {word.Img ? (
                                         <img
-                                            src={word.Img}
+                                            src={`http://localhost:5000/images/${word.Img}`} // הוספת התחילית
                                             alt={word.word}
                                             style={{ width: '150px', height: 'auto', borderRadius: '5px' }}
                                         />
