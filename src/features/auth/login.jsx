@@ -28,11 +28,9 @@ const AuthLogin = () => {
 
             // Navigate to the appropriate section based on the user role
             if (userRole === 'admin') {
-                // navigate('../admin-dashboard'); // דף המנהל
                 navigate('/admin')
             } else if (userRole === 'user') {
-                navigate('../common/Menu')
-                navigate('/lessons'); // דף המשתמש
+                navigate('../home/Home'); 
             } else {
                 navigate('../'); // דף הבית או עמוד ברירת מחדל
             }

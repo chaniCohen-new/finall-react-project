@@ -13,6 +13,7 @@ export const addWord = async (newWord) => {
         const response = await axios.post('http://localhost:5000/words', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}` // הוסף את הטוקן כאן
             },
         });
         return response.data; // החזרת המילה שנוספה
@@ -25,14 +26,18 @@ export const addWord = async (newWord) => {
 // פונקציה למחיקת מילה
 export const deleteWord = async (wordId) => {
     try {
-        const response = await axios.delete(`http://localhost:5000/words`, { data: { _id: wordId } });
+        const response = await axios.delete(`http://localhost:5000/words`, { 
+            data: { _id: wordId },
+            headers: {
+                'Authorization': `Bearer ${token}` // הוסף את הטוקן כאן
+            }
+        });
         return response.data; // החזרת התגובה מהשרת
     } catch (error) {
         console.error("Error deleting word:", error);
         throw error; // זרוק שגיאה אם נכשלה
     }
 };
-
 
 // פונקציה לעדכון מילה
 export const updateWord = async (wordId, updatedWord) => {
@@ -47,7 +52,7 @@ export const updateWord = async (wordId, updatedWord) => {
         const response = await axios.put(`http://localhost:5000/words/${wordId}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${token}` 
+                'Authorization': `Bearer ${token}` // הוסף את הטוקן כאן
             },
         });
         return response.data; // החזרת המילה המעודכנת

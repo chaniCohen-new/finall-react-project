@@ -70,7 +70,9 @@ const WordsTable = () => {
     const handleUpdateWord = async (updatedWord) => {
         try {
             const updated = await updateWord(updatedWord._id, updatedWord);
-            setWords(words.map((word) => (word._id === updated._id ? updated : word)));
+            // ✅ שינוי: גשת ל-updated.word (בגלל שה-Backend מחזיר { word: {...} })
+            const wordData = updated.word || updated;
+            setWords(words.map((word) => (word._id === wordData._id ? wordData : word)));
             setOpenDialog(false);
             setEditingWord(null);
         } catch (error) {

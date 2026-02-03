@@ -1,0 +1,5 @@
+body {
+    direction: rtl; /* שינוי כיוון הזרימה ל-RIGHT TO LEFT */
+    text-align: right; /* אפשרות לשנות את הכיוון של הטקסט */
+  }
+  

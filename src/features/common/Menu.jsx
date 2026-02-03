@@ -15,7 +15,7 @@ const MenuComponent = () => {
     const navigate = useNavigate(); // העבר את קריאת useNavigate לתוך גוף הקומפוננטה
 
     const handleHomeClick = () => {
-        navigate('/'); // ניווט לדף הבית
+        navigate('/home'); // ניווט לדף הבית
     };
 
     const handleCoursesClick = () => {

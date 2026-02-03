@@ -51,7 +51,7 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
     const handleAddWord = async () => {
         try {
             await validationSchema.validate(newWord, { abortEarly: false });
-
+    
             if (editWord) {
                 const updatedWord = {
                     _id: editWord._id,
@@ -61,24 +61,30 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
                     image: newWord.image,
                 };
                 const updated = await updateWord(updatedWord._id, updatedWord);
-                onWordUpdated(updated);
+                onWordUpdated(updated.word || updated);
             } else {
                 const response = await addWord(newWord);
-                onWordAdded(response);
+                onWordAdded(response.word || response);
             }
             onClose();
-        } catch (validationErrors) {
-            const formattedErrors = {};
-            validationErrors.inner.forEach(err => {
-                formattedErrors[err.path] = err.message;
-            });
-            setErrors(formattedErrors);
-            // } catch (error) {
-            //     console.error("Error:", error);
-            //     setErrors({ general: "שגיאה בהוספת המילה, אנא נסה שוב." });
+        } catch (error) {
+            // ✅ בדוק אם זו שגיאת validation או שגיאת API
+            if (error.inner) {
+                // שגיאת Yup validation
+                const formattedErrors = {};
+                error.inner.forEach(err => {
+                    formattedErrors[err.path] = err.message;
+                });
+                setErrors(formattedErrors);
+            } else {
+                // שגיאת API
+                console.error("Error adding word:", error);
+                setErrors({ 
+                    general: error.response?.data?.message || "שגיאה בשמירה. אנא נסה שוב." 
+                });
+            }
         }
     };
-
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>{editWord ? 'ערוך מילה' : 'הוסף מילה חדשה'}</DialogTitle>
@@ -129,12 +135,28 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
                     helperText={errors.lesson}
                     value={newWord.lesson}
                 >
-                    {(lessons || []).map((lesson) => ( // שינוי כאן
+                    {(lessons || []).map((lesson) => (
                         <MenuItem key={lesson._id} value={lesson._id}>
                             {lesson.name}
                         </MenuItem>
                     ))}
+                    <MenuItem value="other">אחר...</MenuItem> {/* אפשרות לכתיבה חופשית */}
                 </TextField>
+
+                {/* שדה נוסף לכתיבה אם נבחר "אחר" */}
+                {newWord.lesson === "other" && (
+                    <TextField
+                        margin="dense"
+                        name="customLesson"
+                        label="שיעור מותאם"
+                        fullWidth
+                        variant="outlined"
+                        onChange={handleNewWordChange}
+                        error={!!errors.customLesson}
+                        helperText={errors.customLesson}
+                        value={newWord.customLesson}
+                    />
+                )}
 
 
                 {/* העלאת תמונה */}

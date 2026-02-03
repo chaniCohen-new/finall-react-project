@@ -15,7 +15,7 @@ const MenuAdminComponent = () => {
     const navigate = useNavigate();
 
     const handleHomeClick = () => {
-        navigate('/'); // ניווט לדף הבית
+        navigate('/home'); // ניווט לדף הבית
     };
 
     const handleLearningClick = () => {
@@ -42,6 +42,9 @@ const MenuAdminComponent = () => {
 
                     <SchoolIcon color="inherit" style={{ margin: '0 10px' }} />
                     <Button color="inherit" onClick={handleLearningClick}>למידה</Button>
+
+                    <Button color="inherit" onClick={() => navigate('/admin/questions')}>  📝 ניהול שאלות</Button>
+
                 </Box>
                 
                 {/* כפתור היציאה בצד ימין */}
