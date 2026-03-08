@@ -18,16 +18,35 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import AddWordDialog from './AddWord'; // ייבוא קומפוננטת ההוספה
-import { addWord, deleteWord, updateWord } from './wordService'; // ייבוא פונקציות ה-API
+import AddWordDialog from './AddWord';
+import { addWord, deleteWord, updateWord } from './wordService';
 
 const WordsTable = () => {
     const [words, setWords] = useState([]);
-    const { lessonId } = useParams(); // קבלת ה-ID של השיעור מה-URL
+    const [lessons, setLessons] = useState([]); // ✅ הוסף state לשיעורים
+    const { lessonId } = useParams();
     const [page, setPage] = useState(0);
     const itemsPerPage = 2;
     const [openDialog, setOpenDialog] = useState(false);
     const [editingWord, setEditingWord] = useState(null);
+
+    // ✅ טען את השיעורים בעת טעינת הקומפוננטה
+    useEffect(() => {
+        const fetchLessons = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/lessons');
+                if (Array.isArray(response.data)) {
+                    setLessons(response.data);
+                } else {
+                    setLessons([]);
+                }
+            } catch (error) {
+                console.error("Error fetching lessons:", error);
+            }
+        };
+
+        fetchLessons();
+    }, []);
 
     useEffect(() => {
         const fetchWords = async () => {
@@ -70,7 +89,6 @@ const WordsTable = () => {
     const handleUpdateWord = async (updatedWord) => {
         try {
             const updated = await updateWord(updatedWord._id, updatedWord);
-            // ✅ שינוי: גשת ל-updated.word (בגלל שה-Backend מחזיר { word: {...} })
             const wordData = updated.word || updated;
             setWords(words.map((word) => (word._id === wordData._id ? wordData : word)));
             setOpenDialog(false);
@@ -147,12 +165,12 @@ const WordsTable = () => {
                                 <TableCell style={{ textAlign: 'center', padding: '20px' }}>
                                     {word.Img ? (
                                         <img
-                                            src={`http://localhost:5000/images/${word.Img}`} // הוספת התחילית
+                                            src={`http://localhost:5000/images/${word.Img}`}
                                             alt={word.word}
                                             style={{ width: '150px', height: 'auto', borderRadius: '5px' }}
                                         />
                                     ) : (
-                                        <Typography>לא קיימת תמונה</Typography> // הוסף הודעה במקרה ואין תמונה
+                                        <Typography>לא קיימת תמונה</Typography>
                                     )}
                                 </TableCell>
 
@@ -172,12 +190,14 @@ const WordsTable = () => {
                 </Table>
             </TableContainer>
 
+            {/* ✅ העבר את lessons prop */}
             <AddWordDialog
                 open={openDialog}
                 onClose={handleAddWordClose}
                 onWordAdded={handleWordAdded}
                 editWord={editingWord}
                 onWordUpdated={handleUpdateWord}
+                lessons={lessons}
             />
         </Paper>
     );

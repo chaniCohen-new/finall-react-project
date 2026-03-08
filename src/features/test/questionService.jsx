@@ -27,6 +27,7 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    TextField,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -37,6 +38,7 @@ const AdminQuestionsPage = () => {
     const [questions, setQuestions] = useState([]);
     const [lessons, setLessons] = useState([]);
     const [selectedLesson, setSelectedLesson] = useState('');
+    const [selectedLessonData, setSelectedLessonData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -44,6 +46,8 @@ const AdminQuestionsPage = () => {
     const [selectedQuestion, setSelectedQuestion] = useState(null);
     const [deleteConfirmDialog, setDeleteConfirmDialog] = useState(false);
     const [questionToDelete, setQuestionToDelete] = useState(null);
+    const [editLoading, setEditLoading] = useState(false); // ✅ חדש
+    const [editError, setEditError] = useState(''); // ✅ חדש
 
     const API_BASE = 'http://localhost:5000';
     const token = localStorage.getItem('token');
@@ -70,6 +74,7 @@ const AdminQuestionsPage = () => {
     useEffect(() => {
         if (!selectedLesson) {
             setQuestions([]);
+            setSelectedLessonData(null);
             return;
         }
 
@@ -94,16 +99,108 @@ const AdminQuestionsPage = () => {
         fetchQuestions();
     }, [selectedLesson]);
 
+    // ✅ עדכן את הנתונים כשבחירה משתנה
+    const handleLessonChange = (e) => {
+        const lessonId = e.target.value;
+        setSelectedLesson(lessonId);
+
+        const lesson = lessons.find(l => l._id === lessonId);
+        setSelectedLessonData(lesson);
+    };
+
     // ✅ Handle add question success
     const handleQuestionAdded = (newQuestion) => {
         setQuestions([...questions, newQuestion]);
         setOpenAddDialog(false);
     };
 
+    // ✅ Open edit dialog
+    const handleEditQuestion = (question) => {
+        setSelectedQuestion({ ...question }); // ✅ עותק של השאלה
+        setEditError('');
+        setOpenEditDialog(true);
+    };
+
+    // ✅ Handle edit changes
+    const handleEditChange = (field, value) => {
+        setSelectedQuestion(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    // ✅ Handle option change in edit
+    const handleEditOptionChange = (index, value) => {
+        const newOptions = [...selectedQuestion.optional];
+        newOptions[index] = value.trim();
+        setSelectedQuestion(prev => ({
+            ...prev,
+            optional: newOptions
+        }));
+    };
+
+    // ✅ Handle save edit
+    const handleSaveEdit = async () => {
+        // Validate
+        if (!selectedQuestion.question.trim()) {
+            setEditError('השאלה היא חובה');
+            return;
+        }
+
+        if (selectedQuestion.optional.filter(o => o.trim()).length < 2) {
+            setEditError('נדרשות לפחות 2 תשובות');
+            return;
+        }
+
+        if (!selectedQuestion.answer.trim()) {
+            setEditError('בחר תשובה נכונה');
+            return;
+        }
+
+        try {
+            setEditLoading(true);
+            setEditError('');
+
+            const cleanedOptions = selectedQuestion.optional
+                .filter(opt => opt.trim().length > 0)
+                .map(opt => opt.trim());
+
+            const payload = {
+                _id: selectedQuestion._id,
+                question: selectedQuestion.question.trim(),
+                optional: cleanedOptions,
+                answer: selectedQuestion.answer.trim(),
+                lesson: selectedQuestion.lesson || selectedLesson,
+            };
+
+            const response = await axios.put(
+                `${API_BASE}/questions`,
+                payload,
+                { headers }
+            );
+
+            // ✅ עדכן את הטבלה
+            setQuestions(questions.map(q => 
+                q._id === selectedQuestion._id ? response.data : q
+            ));
+
+            setOpenEditDialog(false);
+            setSelectedQuestion(null);
+        } catch (err) {
+            console.error('Error updating question:', err);
+            setEditError(
+                err.response?.data?.error || 
+                'שגיאה בעדכון השאלה. אנא נסה שוב.'
+            );
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
     // ✅ Handle delete question
     const handleDeleteQuestion = async () => {
         try {
-            await axios.delete(`${API_BASE}/questions/delete`, {
+            await axios.delete(`${API_BASE}/questions`, {
                 data: { _id: questionToDelete._id },
                 headers,
             });
@@ -119,12 +216,6 @@ const AdminQuestionsPage = () => {
         }
     };
 
-    // ✅ Open edit dialog
-    const handleEditQuestion = (question) => {
-        setSelectedQuestion(question);
-        setOpenEditDialog(true);
-    };
-
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
             {/* ✅ Header */}
@@ -137,6 +228,7 @@ const AdminQuestionsPage = () => {
                     color="success"
                     startIcon={<AddIcon />}
                     onClick={() => setOpenAddDialog(true)}
+                    disabled={!selectedLesson}
                 >
                     הוסף שאלה חדשה
                 </Button>
@@ -156,7 +248,7 @@ const AdminQuestionsPage = () => {
                         <InputLabel>בחר שיעור</InputLabel>
                         <Select
                             value={selectedLesson}
-                            onChange={(e) => setSelectedLesson(e.target.value)}
+                            onChange={handleLessonChange}
                             label="בחר שיעור"
                         >
                             <MenuItem value="">
@@ -164,13 +256,64 @@ const AdminQuestionsPage = () => {
                             </MenuItem>
                             {lessons.map((lesson) => (
                                 <MenuItem key={lesson._id} value={lesson._id}>
-                                    {lesson.name || lesson.title}
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3 }}>
+                                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                            {lesson.name || lesson.title}
+                                        </Typography>
+                                        {lesson.category && (
+                                            <Typography 
+                                                variant="caption" 
+                                                sx={{ color: '#666', fontSize: '0.75rem' }}
+                                            >
+                                                📂 {lesson.category}
+                                            </Typography>
+                                        )}
+                                    </Box>
                                 </MenuItem>
                             ))}
                         </Select>
                     </FormControl>
                 </CardContent>
             </Card>
+
+            {/* ✅ הצגת שיעור נבחר */}
+            {selectedLessonData && (
+                <Paper
+                    elevation={2}
+                    sx={{
+                        p: 2,
+                        backgroundColor: '#e3f2fd',
+                        border: '2px solid #1976d2',
+                        borderRadius: 2,
+                        mb: 3,
+                    }}
+                >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box>
+                            <Typography
+                                variant="subtitle2"
+                                sx={{ fontWeight: 'bold', color: '#1565c0', mb: 0.5 }}
+                            >
+                                📚 שיעור נבחר:
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#0d47a1' }}>
+                                {selectedLessonData.name || selectedLessonData.title}
+                            </Typography>
+                            {selectedLessonData.category && (
+                                <Typography variant="caption" sx={{ color: '#1565c0', display: 'block', mt: 0.5 }}>
+                                    📂 קטגוריה: {selectedLessonData.category}
+                                </Typography>
+                            )}
+                        </Box>
+                        <Typography 
+                            variant="h6" 
+                            sx={{ color: '#1976d2', fontWeight: 'bold' }}
+                        >
+                            {questions.length} שאלות
+                        </Typography>
+                    </Box>
+                </Paper>
+            )}
 
             {/* ✅ Loading state */}
             {loading && (
@@ -268,6 +411,86 @@ const AdminQuestionsPage = () => {
                 onClose={() => setOpenAddDialog(false)}
                 onQuestionAdded={handleQuestionAdded}
             />
+
+            {/* ✅ Edit Question Dialog */}
+            <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)} maxWidth="sm" fullWidth>
+                <DialogTitle sx={{ fontSize: '1.5rem', fontWeight: 'bold' }}>
+                    ✏️ עדכן שאלה
+                </DialogTitle>
+
+                <DialogContent sx={{ pt: 2 }}>
+                    {editError && (
+                        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setEditError('')}>
+                            {editError}
+                        </Alert>
+                    )}
+
+                    {selectedQuestion && (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {/* ✅ Question field */}
+                            <TextField
+                                label="השאלה"
+                                multiline
+                                rows={3}
+                                value={selectedQuestion.question}
+                                onChange={(e) => handleEditChange('question', e.target.value)}
+                                fullWidth
+                                variant="outlined"
+                            />
+
+                            {/* ✅ Options */}
+                            <Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                    תשובות:
+                                </Typography>
+                                {selectedQuestion.optional?.map((option, index) => (
+                                    <TextField
+                                        key={index}
+                                        label={`תשובה ${index + 1}`}
+                                        value={option}
+                                        onChange={(e) => handleEditOptionChange(index, e.target.value)}
+                                        fullWidth
+                                        size="small"
+                                        sx={{ mb: 1 }}
+                                    />
+                                ))}
+                            </Box>
+
+                            {/* ✅ Correct answer selector */}
+                            <FormControl fullWidth>
+                                <InputLabel>תשובה נכונה</InputLabel>
+                                <Select
+                                    value={selectedQuestion.answer}
+                                    onChange={(e) => handleEditChange('answer', e.target.value)}
+                                    label="תשובה נכונה"
+                                >
+                                    {selectedQuestion.optional
+                                        ?.filter(opt => opt.trim())
+                                        .map((option, index) => (
+                                            <MenuItem key={index} value={option}>
+                                                {option}
+                                            </MenuItem>
+                                        ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    )}
+                </DialogContent>
+
+                <DialogActions sx={{ p: 2, gap: 1 }}>
+                    <Button onClick={() => setOpenEditDialog(false)} variant="outlined">
+                        ביטול
+                    </Button>
+                    <Button
+                        onClick={handleSaveEdit}
+                        variant="contained"
+                        color="primary"
+                        disabled={editLoading}
+                    >
+                        {editLoading ? <CircularProgress size={24} /> : 'שמור שינויים'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             {/* ✅ Delete Confirmation Dialog */}
             <Dialog open={deleteConfirmDialog} onClose={() => setDeleteConfirmDialog(false)}>

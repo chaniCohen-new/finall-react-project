@@ -10,12 +10,12 @@ import {
     MenuItem,
     Typography,
 } from '@mui/material';
-import { addWord, updateWord } from './wordService'; // הייבוא הנדרש
+import { addWord, updateWord } from './wordService';
 import { object, string } from 'yup';
 
 const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, lessons }) => {
     const [newWord, setNewWord] = useState({ word: '', translating: '', lesson: '', image: null });
-    const [errors, setErrors] = useState({}); // טיפול בשגיאות
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (editWord) {
@@ -35,11 +35,10 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
         const { name, value } = e.target;
         setNewWord({ ...newWord, [name]: value });
 
-        // מחיקת השגיאה של השדה הנוכחי אם יש שגיאה
         if (errors[name]) {
             setErrors((prevErrors) => ({
                 ...prevErrors,
-                [name]: undefined // מחק את השגיאה מהשדה הנוכחי
+                [name]: undefined
             }));
         }
     };
@@ -51,7 +50,7 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
     const handleAddWord = async () => {
         try {
             await validationSchema.validate(newWord, { abortEarly: false });
-    
+
             if (editWord) {
                 const updatedWord = {
                     _id: editWord._id,
@@ -68,16 +67,13 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
             }
             onClose();
         } catch (error) {
-            // ✅ בדוק אם זו שגיאת validation או שגיאת API
             if (error.inner) {
-                // שגיאת Yup validation
                 const formattedErrors = {};
                 error.inner.forEach(err => {
                     formattedErrors[err.path] = err.message;
                 });
                 setErrors(formattedErrors);
             } else {
-                // שגיאת API
                 console.error("Error adding word:", error);
                 setErrors({ 
                     general: error.response?.data?.message || "שגיאה בשמירה. אנא נסה שוב." 
@@ -85,6 +81,7 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
             }
         }
     };
+
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>{editWord ? 'ערוך מילה' : 'הוסף מילה חדשה'}</DialogTitle>
@@ -122,12 +119,12 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
                     value={newWord.translating}
                 />
 
-                {/* שדה לשיעור */}
+                {/* ✅ שדה לשיעור עם רשימת שיעורים מותאמים */}
                 <TextField
                     select
                     margin="dense"
                     name="lesson"
-                    label="שיעור"
+                    label="בחר שיעור"
                     fullWidth
                     variant="outlined"
                     onChange={handleNewWordChange}
@@ -135,29 +132,13 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
                     helperText={errors.lesson}
                     value={newWord.lesson}
                 >
+                    <MenuItem value="">-- בחר שיעור --</MenuItem>
                     {(lessons || []).map((lesson) => (
                         <MenuItem key={lesson._id} value={lesson._id}>
                             {lesson.name}
                         </MenuItem>
                     ))}
-                    <MenuItem value="other">אחר...</MenuItem> {/* אפשרות לכתיבה חופשית */}
                 </TextField>
-
-                {/* שדה נוסף לכתיבה אם נבחר "אחר" */}
-                {newWord.lesson === "other" && (
-                    <TextField
-                        margin="dense"
-                        name="customLesson"
-                        label="שיעור מותאם"
-                        fullWidth
-                        variant="outlined"
-                        onChange={handleNewWordChange}
-                        error={!!errors.customLesson}
-                        helperText={errors.customLesson}
-                        value={newWord.customLesson}
-                    />
-                )}
-
 
                 {/* העלאת תמונה */}
                 <input

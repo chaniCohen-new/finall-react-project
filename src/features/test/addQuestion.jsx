@@ -29,7 +29,8 @@ const AdminAddQuestion = ({ lessonId, onQuestionAdded, open, onClose }) => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [lessons, setLessons] = useState([]);
-    const [selectedLesson, setSelectedLesson] = useState(lessonId || '');
+    const [selectedLesson, setSelectedLesson] = useState('');
+    const [selectedLessonData, setSelectedLessonData] = useState(null);
 
     // ✅ Fetch lessons on mount
     useEffect(() => {
@@ -53,14 +54,34 @@ const AdminAddQuestion = ({ lessonId, onQuestionAdded, open, onClose }) => {
         fetchLessons();
     }, []);
 
-    // ✅ Reset form
-    const resetForm = () => {
-        setQuestion('');
-        setOptions(['', '', '']);
-        setCorrectAnswer('');
-        setError('');
-        setSuccess('');
+    // ✅ עדכן שיעור כשמקבלים lessonId מ-prop או כשמשתנים lessons
+    useEffect(() => {
+        if (lessonId && lessons.length > 0) {
+            setSelectedLesson(lessonId);
+            const lesson = lessons.find(l => l._id === lessonId);
+            setSelectedLessonData(lesson);
+        }
+    }, [lessonId, lessons]);
+
+    // ✅ עדכן את הנתונים כשבחירה משתנה
+    const handleLessonChange = (e) => {
+        const selectedLessonId = e.target.value;
+        setSelectedLesson(selectedLessonId);
+
+        const lesson = lessons.find(l => l._id === selectedLessonId);
+        setSelectedLessonData(lesson);
     };
+
+    // ✅ Reset form כשהדיאלוג נסגר
+    useEffect(() => {
+        if (!open) {
+            setQuestion('');
+            setOptions(['', '', '']);
+            setCorrectAnswer('');
+            setError('');
+            setSuccess('');
+        }
+    }, [open]);
 
     // ✅ Handle option change
     const handleOptionChange = (index, value) => {
@@ -148,7 +169,6 @@ const AdminAddQuestion = ({ lessonId, onQuestionAdded, open, onClose }) => {
             );
 
             setSuccess('שאלה נוספה בהצלחה!');
-            resetForm();
 
             // ✅ Callback to parent component
             if (onQuestionAdded) {
@@ -162,7 +182,7 @@ const AdminAddQuestion = ({ lessonId, onQuestionAdded, open, onClose }) => {
         } catch (err) {
             console.error('Error adding question:', err);
             setError(
-                err.response?.data?.error || 
+                err.response?.data?.error ||
                 'שגיאה בהוספת השאלה. אנא נסה שוב.'
             );
         } finally {
@@ -192,13 +212,13 @@ const AdminAddQuestion = ({ lessonId, onQuestionAdded, open, onClose }) => {
                 )}
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                    {/* ✅ Lesson selector */}
+                    {/* ✅ Lesson selector (רק אם לא יש lessonId מ-prop) */}
                     {!lessonId && (
                         <FormControl fullWidth>
                             <InputLabel>בחר שיעור</InputLabel>
                             <Select
                                 value={selectedLesson}
-                                onChange={(e) => setSelectedLesson(e.target.value)}
+                                onChange={handleLessonChange}
                                 label="בחר שיעור"
                             >
                                 <MenuItem value="">
@@ -206,11 +226,51 @@ const AdminAddQuestion = ({ lessonId, onQuestionAdded, open, onClose }) => {
                                 </MenuItem>
                                 {lessons.map((lesson) => (
                                     <MenuItem key={lesson._id} value={lesson._id}>
-                                        {lesson.name || lesson.title}
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3 }}>
+                                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                                {lesson.name || lesson.title}
+                                            </Typography>
+                                            {lesson.category && (
+                                                <Typography 
+                                                    variant="caption" 
+                                                    sx={{ color: '#666', fontSize: '0.75rem' }}
+                                                >
+                                                    📂 {lesson.category}
+                                                </Typography>
+                                            )}
+                                        </Box>
                                     </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
+                    )}
+
+                    {/* ✅ הצגת שיעור נבחר */}
+                    {selectedLessonData && (
+                        <Paper
+                            elevation={2}
+                            sx={{
+                                p: 2,
+                                backgroundColor: '#e3f2fd',
+                                border: '2px solid #1976d2',
+                                borderRadius: 2,
+                            }}
+                        >
+                            <Typography
+                                variant="subtitle2"
+                                sx={{ fontWeight: 'bold', color: '#1565c0', mb: 0.5 }}
+                            >
+                                📚 שיעור נבחר:
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#0d47a1' }}>
+                                {selectedLessonData.name || selectedLessonData.title}
+                            </Typography>
+                            {selectedLessonData.category && (
+                                <Typography variant="caption" sx={{ color: '#1565c0', display: 'block', mt: 0.5 }}>
+                                    📂 קטגוריה: {selectedLessonData.category}
+                                </Typography>
+                            )}
+                        </Paper>
                     )}
 
                     {/* ✅ Question input */}

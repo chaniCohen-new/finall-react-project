@@ -13,13 +13,14 @@ export const addWord = async (newWord) => {
         const response = await axios.post('http://localhost:5000/words', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${token}` // הוסף את הטוקן כאן
+                'Authorization': `Bearer ${token}`
             },
         });
-        return response.data; // החזרת המילה שנוספה
+        // ✅ בדוק אם התגובה קיימת וחלץ את word property
+        return response.data.word ? response.data : { word: response.data };
     } catch (error) {
         console.error("Error adding word:", error);
-        throw error; // זרוק שגיאה אם נכשלה
+        throw error;
     }
 };
 

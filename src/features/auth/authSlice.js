@@ -4,38 +4,37 @@ const authSlice = createSlice({
     name: "auth",
     initialState: {
         token: localStorage.getItem("token") || "",
-        user: localStorage.getItem("user") || "",
-        isUserLoggedIn: localStorage.getItem("token") ? true : false,
-        userFullName: "",
-        message: '',  // הוסף את state להודעות
-        error: ''     // הוסף את state לשגיאות
+        user: localStorage.getItem("user") || "", // ✅ כבר string מ-localStorage
+        isUserLoggedIn: !!localStorage.getItem("token"), // ✅ boolean בדרך נכונה
+        message: '',
+        error: ''
     },
     reducers: {
         setToken: (state, action) => {
-            const token = action.payload.token;
-            const user = action.payload.user;
-            state.user = user;
+            const { token, user } = action.payload;
             state.token = token;
+            state.user = typeof user === 'string' ? user : JSON.stringify(user); // ✅ וודא שזה string
             state.isUserLoggedIn = true;
-            localStorage.setItem("token", token);
-            localStorage.setItem("user", user);
+            state.error = '';
         },
         removeToken: (state) => {
             state.token = "";
             state.user = "";
             state.isUserLoggedIn = false;
+            state.message = '';
+            state.error = '';
             localStorage.removeItem("token");
             localStorage.removeItem("user");
         },
         setMessage: (state, action) => {
-            state.message = action.payload;  // הגדרת ההודעה
+            state.message = action.payload;
         },
         setError: (state, action) => {
-            state.error = action.payload;    // הגדרת השגיאה
+            state.error = action.payload;
         }
     }
 });
 
 export default authSlice.reducer;
-export const { setToken, removeToken, setMessage, setError } = authSlice.actions; // הוסף את הפונקציות המיוצאות
+export const { setToken, removeToken, setMessage, setError } = authSlice.actions;
 export const selectToken = (state) => state.auth.token;

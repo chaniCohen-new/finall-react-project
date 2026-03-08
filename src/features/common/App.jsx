@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import AuthLogin from '../auth/Login';
-import AuthRegister from '../auth/Register';
+import AuthLogin from '../auth/login';
+import AuthRegister from '../auth/register';
 import useAuth from '../auth/useAuth';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -11,7 +11,7 @@ import QuizComponent from '../test/test';
 import CourseComponent from '../lesson/lessonLogin';
 import LevelSelection from '../lesson/LevelSelection';
 import MenuAdminComponent from './MenuAdmin';
-import MenuComponent from './Menu'; // ✅ הוסף
+import MenuComponent from './Menu';
 import UserExams from '../user/profile';
 import AdminQuestionsPage from '../test/questionService';
 import Home from '../home/Home';
@@ -20,8 +20,9 @@ import Home from '../home/Home';
 const ProtectedLayout = ({ children, admin = false }) => {
   const { isAdmin, isUser } = useAuth();
 
+  // ✅ בדיקת הרשאות
   if (admin && !isAdmin) {
-    return <Navigate to="/lessons" />;
+    return <Navigate to="/home" />;
   }
 
   if (!isAdmin && !isUser) {
@@ -38,31 +39,30 @@ const ProtectedLayout = ({ children, admin = false }) => {
   );
 };
 
-// ✅ Protected Route
-const ProtectedRoute = ({ children, admin = false }) => {
-  const { isAdmin, isUser } = useAuth();
-
-  if (admin && !isAdmin) {
-    return <Navigate to="/lessons" />;
-  }
-
-  if (!isAdmin && !isUser) {
-    return <Navigate to="/" />;
-  }
-
-  return children;
-};
-
 function App() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, isUser, isTokenValid } = useAuth();
+
+  // ✅ אם המשתמש כבר מחובר, הפנה אותו לדף הבית
+  const ProtectedAuthRoute = ({ element }) => {
+    if (isTokenValid) {
+      return isAdmin ? <Navigate to="/admin" /> : <Navigate to="/home" />;
+    }
+    return element;
+  };
 
   return (
     <Router>
       <div className="App">
         <Routes>
-          {/* ✅ Public */}
-          <Route path="/" element={<AuthLogin />} />
-          <Route path="/register" element={<AuthRegister />} />
+          {/* ✅ Public - אבל מוגן אם יש token */}
+          <Route 
+            path="/" 
+            element={<ProtectedAuthRoute element={<AuthLogin />} />} 
+          />
+          <Route 
+            path="/register" 
+            element={<ProtectedAuthRoute element={<AuthRegister />} />} 
+          />
 
           {/* ✅ Admin only */}
           <Route
@@ -139,6 +139,9 @@ function App() {
               </ProtectedLayout>
             }
           />
+
+          {/* ✅ Catch All */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
     </Router>

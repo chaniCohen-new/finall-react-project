@@ -80,7 +80,7 @@ import {
                   variant="contained"
                   size="large"
                   component={RouterLink}
-                  to="/courses"
+                  to="/lessons"  
                   sx={{
                     background: 'white',
                     color: '#667eea',
