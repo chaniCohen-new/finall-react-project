@@ -38,7 +38,7 @@ const UserExams = () => {
                 const token = localStorage.getItem('token');
 
                 const response = await axios.get(
-                    `http://localhost:5000/exams/${userId}`,
+                    `http://localhost:5000/exams/user/${userId}`, 
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }

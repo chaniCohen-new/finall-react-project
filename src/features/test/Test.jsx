@@ -21,7 +21,7 @@ import {
 import ErrorIcon from '@mui/icons-material/Error';
 
 const QuizComponent = () => {
-    const { userId, isTokenValid } = useAuth(); // ✅ השתמש בזה
+    const { userId, isTokenValid } = useAuth();
     const [questionData, setQuestionData] = useState(null);
     const [selectedOption, setSelectedOption] = useState('');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -34,8 +34,18 @@ const QuizComponent = () => {
     const { lessonId } = useParams();
     const navigate = useNavigate();
 
-    // ✅ Base API URL
-    const API_URL ='http://localhost:5000';
+    const API_URL = 'http://localhost:5000';
+
+    // ✅ בדוק אם userId תקין בהתחלה
+    useEffect(() => {
+        if (!isTokenValid) {
+            setError('לא הצליח לאמת את הזהות. אנא התחבר מחדש.');
+        }
+        if (!userId) {
+            setError('לא נמצא מזהה משתמש. אנא התחבר מחדש.');
+            setLoading(false);
+        }
+    }, [isTokenValid, userId]);
 
     // ✅ Fetch questions
     useEffect(() => {
@@ -74,49 +84,70 @@ const QuizComponent = () => {
             }
         };
 
-        if (lessonId) {
+        if (lessonId && userId) {
             fetchQuestions();
         }
-    }, [lessonId]);
+    }, [lessonId, userId]);
 
-    // ✅ Handle option selection
     const handleOptionChange = (event) => {
         setSelectedOption(event.target.value);
     };
 
-    // ✅ Save exam
-    const saveExam = async (finalScore) => {
-        try {
-            setSavingExam(true);
-            const token = localStorage.getItem('token');
+// ✅ Save exam
+const saveExam = async (finalScore) => {
+    try {
+        setSavingExam(true);
+        const token = localStorage.getItem('token');
 
-            if (!token) {
-                setError('No token found');
-                return;
-            }
-
-            await axios.post(
-                `${API_URL}/exams`,
-                { mark: finalScore, lesson: lessonId, user: userId 
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
-
-            navigate('/profile');
-        } catch (error) {
-            setError('שגיאה בשמירת הבחינה.');
-            console.error('Error saving exam:', error.response?.data || error.message);
-        } finally {
+        if (!token) {
+            setError('No token found');
             setSavingExam(false);
+            return;
         }
-    };
 
-    // ✅ Handle submit answer
+        if (!lessonId || lessonId === '') {
+            setError('Lesson ID is missing.');
+            setSavingExam(false);
+            return;
+        }
+
+        // ✅ שלח רק mark ו-lesson (לא user!)
+        const examData = {
+            mark: finalScore,
+            lesson: lessonId
+        };
+
+        console.log('📤 Sending exam data:', examData);
+
+        const response = await axios.post(
+            `${API_URL}/exams`,
+            examData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        console.log('✅ Exam saved successfully:', response.data);
+        navigate('/profile');
+    } catch (error) {
+        console.error('❌ Error saving exam:');
+        console.error('Status:', error.response?.status);
+        console.error('Data:', error.response?.data);
+
+        if (error.response?.status === 400) {
+            setError(`בעיה בנתונים: ${error.response?.data?.message || 'נתונים חסרים או שגויים'}`);
+        } else if (error.response?.status === 401) {
+            setError('הפעילות שלך פקעה. אנא התחבר מחדש.');
+        } else {
+            setError('שגיאה בשמירת הבחינה.');
+        }
+    } finally {
+        setSavingExam(false);
+    }
+};    // ✅ Handle submit answer
     const handleSubmit = async () => {
         if (!selectedOption) return;
 

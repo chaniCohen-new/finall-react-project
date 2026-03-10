@@ -1,11 +1,28 @@
 import { useSelector } from "react-redux";
-import { selectToken } from "./authSlice";
-import { jwtDecode } from "jwt-decode";
+import { selectToken, selectUser, selectIsUserLoggedIn } from "./authSlice";
 
+/**
+ * ✅ useAuth - hook לקבלת פרטי המשתמש מ-Redux
+ * 
+ * שימוש:
+ * const { userId, isAdmin, isTokenValid } = useAuth();
+ * 
+ * החזרה:
+ * - userId: מזהה ייחודי של המשתמש
+ * - username: שם משתמש
+ * - fullname: שם מלא
+ * - email: כתובת מייל
+ * - isAdmin: האם הוא מנהל?
+ * - isUser: האם הוא משתמש רגיל?
+ * - isTokenValid: האם ה-token בתוקף?
+ */
 const useAuth = () => {
+    // ✅ קבל מ-Redux
     const token = useSelector(selectToken);
-    
-    // ✅ הגדר ערכי ברירת מחדל
+    const user = useSelector(selectUser);
+    const isUserLoggedIn = useSelector(selectIsUserLoggedIn);
+
+    // ✅ הגדר ערכי ברירת מחדל במקרה שה-user לא קיים
     const defaultAuth = {
         username: "",
         fullname: "",
@@ -16,41 +33,21 @@ const useAuth = () => {
         isTokenValid: false,
     };
 
-    if (!token) {
+    // ✅ אם אין token או user, החזר ברירת מחדל
+    if (!token || !user || !isUserLoggedIn) {
         return defaultAuth;
     }
 
-    try {
-        const userDecoded = jwtDecode(token);
-
-        // ✅ בדוק expiration
-        const currentTime = Date.now() / 1000;
-        if (userDecoded.exp && userDecoded.exp < currentTime) {
-            console.warn("Token expired");
-            return defaultAuth;
-        }
-
-        const { 
-            username: user = "", 
-            name = "", 
-            role = "user", 
-            _id = "", 
-            email: userEmail = "" 
-        } = userDecoded;
-
-        return {
-            username: user,
-            fullname: name,
-            userId: _id,
-            email: userEmail,
-            isAdmin: role === "admin",
-            isUser: role === "user",
-            isTokenValid: true,
-        };
-    } catch (error) {
-        console.error("Error decoding token:", error);
-        return defaultAuth;
-    }
+    // ✅ החזר את המידע מ-user object ב-Redux
+    return {
+        username: user.username || "",
+        fullname: user.name || "",
+        userId: user.userId || "",
+        email: user.email || "",
+        isAdmin: user.role === "admin",
+        isUser: user.role === "user",
+        isTokenValid: true,
+    };
 };
 
 export default useAuth;

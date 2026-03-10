@@ -53,7 +53,6 @@ const AuthLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     
-    // ✅ בדיקה בצד הקליינט
     if (!validateLogin()) {
       return;
     }
@@ -73,13 +72,19 @@ const AuthLogin = () => {
       
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', userString);
-      dispatch(setToken({ token: data.token, user: userString }));
+      
+      dispatch(setToken({ 
+        token: data.token, 
+        user: userString 
+      }));
+      
       dispatch(setMessage('✅ ' + (data.message || 'התחברות בהצלחה!')));
 
       const userDecoded = jwtDecode(data.token);
       const userRole = userDecoded.role;
 
       setTimeout(() => {
+        setLoading(false);  // ✅ כבה loading כאן גם!
         if (userRole === 'admin') {
           navigate('/admin', { replace: true });
         } else if (userRole === 'user') {
@@ -92,7 +97,6 @@ const AuthLogin = () => {
     } catch (err) {
       setLoading(false);
       
-      // ✅ הצגת שגיאה ברורה מהשרת
       let errorMsg = 'התחברות נכשלה';
       
       if (err.response?.status === 401) {
@@ -108,7 +112,7 @@ const AuthLogin = () => {
       console.error('Login error:', err);
       dispatch(setError(errorMsg));
     }
-  };
+};
 
   return (
     <Box
@@ -365,3 +369,9 @@ const AuthLogin = () => {
 };
 
 export default AuthLogin;
+
+// ✅ נתוני המשתמש (יהיו זמינים בכל מקום בקוד):
+// שם המשתמש (כתובת המייל שלו): yaelc5570@gmail.com
+// תכנית: premium
+// קטגוריה: תכנות
+// sessionId: 1079ecde-a8c2-4d28-8002-cab547a433a8
