@@ -154,21 +154,21 @@ left: '-100px',
 <Fade in={true} timeout={500}>
 <Box sx={{ mb: 6 }}>
 <Button
-startIcon={<ArrowBackIcon />}
-onClick={() => navigate('/lessons')}
-sx={{
-color: 'white',
-fontSize: '1rem',
-fontWeight: 600,
-mb: 3,
-transition: 'all 0.3s ease',
-'&:hover': {
-background: 'rgba(255, 255, 255, 0.15)',
-transform: 'translateX(5px)',
-},
-}}
+  endIcon={<ArrowBackIcon sx={{ transform: 'scaleX(-1)' }} />}
+  onClick={() => navigate('/lessons')}
+  sx={{
+    color: 'white',
+    fontSize: '1rem',
+    fontWeight: 600,
+    mb: 3,
+    transition: 'all 0.3s ease',
+    '&:hover': {
+      background: 'rgba(255, 255, 255, 0.15)',
+      transform: 'translateX(5px)',
+    },
+  }}
 >
-חזור
+  חזור
 </Button>
 
 <Box

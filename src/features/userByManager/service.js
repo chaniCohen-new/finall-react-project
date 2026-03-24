@@ -60,6 +60,7 @@ export const deleteUser = async (userId) => {
     }
 
     try {
+        // ✅ תקן את ה-endpoint - "user" singular, לא "users"
         const response = await axios.delete(`${API_URL}users/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`

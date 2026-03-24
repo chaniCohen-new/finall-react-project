@@ -111,10 +111,10 @@ setSavingExam(false);
 return;
 }
 
-// ✅ שלח רק mark ו-lesson (לא user!)
 const examData = {
 mark: finalScore,
-lesson: lessonId
+lesson: lessonId,
+createdAt: new Date().toISOString()  
 };
 
 console.log('📤 Sending exam data:', examData);

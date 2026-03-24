@@ -25,6 +25,19 @@ const UserExams = () => {
 
     const { username, userId } = useAuth();
 
+    const formatDate = (isoDate) => {
+        if (!isoDate) return '-';
+        const date = new Date(isoDate);
+        return date.toLocaleString('he-IL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    };
+
     useEffect(() => {
         const fetchExams = async () => {
             if (!userId) {
@@ -70,7 +83,6 @@ const UserExams = () => {
         return <Alert severity="error">{error}</Alert>;
     }
 
-    // ✅ הוסף סטטיסטיקה
     const averageMark = exams.length > 0
         ? (exams.reduce((sum, exam) => sum + exam.mark, 0) / exams.length).toFixed(2)
         : 0;
@@ -78,7 +90,7 @@ const UserExams = () => {
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
             <Typography variant="h4" color="primary" gutterBottom>
-                ברוכים הבאים, {username}! 👋
+                כל הכבוד {username}! 👋
             </Typography>
 
             {/* ✅ סטטיסטיקה */}
@@ -101,24 +113,102 @@ const UserExams = () => {
                 </Card>
             </Box>
 
-            {/* ✅ טבלה */}
+            {/* ✅ טבלה עם עמודות פרופורציונליות */}
             {exams.length > 0 ? (
-                <TableContainer component={Paper}>
+                <TableContainer component={Paper} sx={{ boxShadow: 2 }}>
                     <Table>
                         <TableHead>
                             <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                                <TableCell><strong>קטגוריה</strong></TableCell>
-                                <TableCell><strong>שלב</strong></TableCell>
-                                <TableCell align="center"><strong>ציון</strong></TableCell>
+                                <TableCell 
+                                    sx={{ 
+                                        flex: 1, 
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        padding: '16px'
+                                    }}
+                                >
+                                    קטגוריה
+                                </TableCell>
+                                <TableCell 
+                                    sx={{ 
+                                        flex: 1, 
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        padding: '16px'
+                                    }}
+                                >
+                                    שלב
+                                </TableCell>
+                                <TableCell 
+                                    sx={{ 
+                                        flex: 1, 
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        padding: '16px'
+                                    }}
+                                >
+                                    תאריך ושעה
+                                </TableCell>
+                                <TableCell 
+                                    sx={{ 
+                                        flex: 1, 
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        padding: '16px'
+                                    }}
+                                >
+                                    ציון
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {exams.map((exam) => (
-                                <TableRow key={exam._id} hover>
-                                    <TableCell>{exam.lesson?.category || '-'}</TableCell>
-                                    <TableCell>{exam.lesson?.level || '-'}</TableCell>
-                                    <TableCell align="center">
-                                        <strong>{exam.mark}</strong>
+                                <TableRow 
+                                    key={exam._id} 
+                                    hover
+                                    sx={{ 
+                                        '&:hover': { backgroundColor: '#f9f9f9' },
+                                        height: '64px'
+                                    }}
+                                >
+                                    <TableCell 
+                                        sx={{ 
+                                            flex: 1, 
+                                            textAlign: 'center',
+                                            padding: '16px'
+                                        }}
+                                    >
+                                        {exam.lesson?.category || '-'}
+                                    </TableCell>
+                                    <TableCell 
+                                        sx={{ 
+                                            flex: 1, 
+                                            textAlign: 'center',
+                                            padding: '16px'
+                                        }}
+                                    >
+                                        {exam.lesson?.level || '-'}
+                                    </TableCell>
+                                    <TableCell 
+                                        sx={{ 
+                                            flex: 1, 
+                                            textAlign: 'center',
+                                            padding: '16px'
+                                        }}
+                                    >
+                                        {formatDate(exam.createdAt)}
+                                    </TableCell>
+                                    <TableCell 
+                                        sx={{ 
+                                            flex: 1, 
+                                            textAlign: 'center',
+                                            padding: '16px',
+                                            fontWeight: 'bold',
+                                            fontSize: '16px',
+                                            color: '#1976d2'
+                                        }}
+                                    >
+                                        {exam.mark}
                                     </TableCell>
                                 </TableRow>
                             ))}

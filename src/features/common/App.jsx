@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"; // ✅ useEffect צריך להיות כאן!
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AuthLogin from '../auth/login';
@@ -42,18 +42,13 @@ const ProtectedLayout = ({ children, admin = false }) => {
 };
 
 function App() {
-    const dispatch = useDispatch(); // ✅ dispatch actions
+    const dispatch = useDispatch();
     const { isAdmin, isUser, isTokenValid } = useAuth();
 
-    /**
-     * ✅ בהתחלה, טען את ה-auth מ-localStorage
-     * זה חשוב כשהמשתמש רענן את הדף
-     */
     useEffect(() => {
         dispatch(hydrateAuth());
     }, [dispatch]);
 
-    // ✅ אם המשתמש כבר מחובר, הפנה אותו לדף הבית
     const ProtectedAuthRoute = ({ element }) => {
         if (isTokenValid) {
             return isAdmin ? <Navigate to="/admin" /> : <Navigate to="/home" />;
@@ -101,11 +96,11 @@ function App() {
                         }
                     />
 
-                    {/* ✅ Students & Admins */}
+                    {/* ✅ Students & Admins - שמור על התפריט המתאים */}
                     <Route
                         path="/home"
                         element={
-                            <ProtectedLayout>
+                            <ProtectedLayout admin={isAdmin}>
                                 <Home />
                             </ProtectedLayout>
                         }
@@ -113,7 +108,7 @@ function App() {
                     <Route
                         path="/lessons"
                         element={
-                            <ProtectedLayout>
+                            <ProtectedLayout admin={isAdmin}> {/* ✅ שמור על הרמת גישה */}
                                 <LevelSelection />
                             </ProtectedLayout>
                         }
@@ -121,7 +116,7 @@ function App() {
                     <Route
                         path="/lessons/level/:level"
                         element={
-                            <ProtectedLayout>
+                            <ProtectedLayout admin={isAdmin}>
                                 <CourseComponent />
                             </ProtectedLayout>
                         }
@@ -129,7 +124,7 @@ function App() {
                     <Route
                         path="/words/:lessonId"
                         element={
-                            <ProtectedLayout>
+                            <ProtectedLayout admin={isAdmin}>
                                 <StudyWord />
                             </ProtectedLayout>
                         }
@@ -137,7 +132,7 @@ function App() {
                     <Route
                         path="/quiz/:lessonId"
                         element={
-                            <ProtectedLayout>
+                            <ProtectedLayout admin={isAdmin}>
                                 <QuizComponent />
                             </ProtectedLayout>
                         }
@@ -145,7 +140,7 @@ function App() {
                     <Route
                         path="/profile"
                         element={
-                            <ProtectedLayout>
+                            <ProtectedLayout admin={isAdmin}>
                                 <UserExams />
                             </ProtectedLayout>
                         }
