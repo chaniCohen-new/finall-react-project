@@ -483,28 +483,6 @@ const AuthRegister = () => {
                   }}
                 />
 
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel>Account Type</InputLabel>
-                  <Select
-                    value={role}
-                    label="Account Type"
-                    onChange={(e) => {
-                      setRole(e.target.value);
-                      dispatch(setError(''));
-                    }}
-                    disabled={loading}
-                    sx={{
-                      borderRadius: '12px',
-                      '& .MuiOutlinedInput-input': {
-                        py: 1.5,
-                      },
-                    }}
-                  >
-                    <MenuItem value="user">Student</MenuItem>
-                    <MenuItem value="admin">Instructor</MenuItem>
-                  </Select>
-                </FormControl>
-
                 <Button
                   fullWidth
                   size="large"

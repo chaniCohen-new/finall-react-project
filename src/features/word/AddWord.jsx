@@ -178,7 +178,7 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
                     inputProps={{ dir: 'rtl' }}
                 />
 
-                {/* שדה לשיעור עם רשימת שיעורים */}
+                {/* ✅ שדה לשיעור - עם Box ו-Typography בתוך MenuItem */}
                 <TextField
                     select
                     margin="dense"
@@ -192,10 +192,25 @@ const AddWordDialog = ({ open, onClose, onWordAdded, editWord, onWordUpdated, le
                     value={newWord.lesson}
                     disabled={loading || (lessons && lessons.length === 0)}
                 >
-                    <MenuItem value="">-- בחר שיעור --</MenuItem>
+                    <MenuItem value="">
+                        <em>-- בחר שיעור --</em>
+                    </MenuItem>
                     {(lessons || []).map((lesson) => (
                         <MenuItem key={lesson._id} value={lesson._id}>
-                            {lesson.name}
+                            {/* ✅ אותו פורמט כמו ב-AdminAddQuestion */}
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.3 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                    {lesson.name || lesson.title}
+                                </Typography>
+                                {lesson.category && (
+                                    <Typography 
+                                        variant="caption" 
+                                        sx={{ color: '#666', fontSize: '0.75rem' }}
+                                    >
+                                        📂 {lesson.category}
+                                    </Typography>
+                                )}
+                            </Box>
                         </MenuItem>
                     ))}
                 </TextField>

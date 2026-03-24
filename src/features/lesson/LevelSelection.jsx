@@ -138,7 +138,7 @@ const LevelSelection = () => {
           </Alert>
         )}
 
-        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid container spacing={3} sx={{ mb: 4 }} justifyContent="center">
           {levels.map((level) => {
             const IconComponent = level.icon;
             return (

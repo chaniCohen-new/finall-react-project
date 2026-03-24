@@ -12,26 +12,26 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useNavigate } from 'react-router-dom';
 
 const MenuComponent = () => {
-    const navigate = useNavigate(); // העבר את קריאת useNavigate לתוך גוף הקומפוננטה
+    const navigate = useNavigate();
 
     const handleHomeClick = () => {
-        navigate('/home'); // ניווט לדף הבית
+        navigate('/home');
     };
 
     const handleCoursesClick = () => {
-        navigate('/lessons'); // ניווט לדף הקורסים
+        navigate('/lessons');
     };
 
     const handleProfileClick = () => {
-        navigate('/profile'); // ניווט לדף האזור האישי
+        navigate('/profile');
     };
 
     const handleLogoutClick = () => {
-        navigate(-1); // ניווט לדף הקודם
+        navigate(-1);
     };
 
     return (
-        <AppBar position="static">
+        <AppBar position="static" sx={{ backgroundColor: '#9CA3AF' }}>
             <Toolbar>
                 <Box display="flex" flexGrow={1}>
                     <HomeIcon color="inherit" style={{ margin: '0 10px' }} />
@@ -44,7 +44,6 @@ const MenuComponent = () => {
                     <Button color="inherit" onClick={handleProfileClick}>איזור אישי</Button>
                 </Box>
                 
-                {/* כפתור היציאה בצד ימין */}
                 <Box marginLeft="auto">
                     <ExitToAppIcon color="inherit" style={{ margin: '0 10px' }} />
                     <Button color="inherit" onClick={handleLogoutClick}>יציאה</Button>

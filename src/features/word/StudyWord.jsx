@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import {
@@ -24,6 +24,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LockIcon from '@mui/icons-material/Lock';
 import AddWordDialog from './AddWord';
 import { addWord, deleteWord, updateWord } from './wordService';
+import useAuth from '../auth/useAuth'; // ✅ Import ה-Hook
 
 const WordsTable = () => {
     const [words, setWords] = useState([]);
@@ -35,34 +36,10 @@ const WordsTable = () => {
     const [editingWord, setEditingWord] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false);
     const [showAdminMessage, setShowAdminMessage] = useState(false);
 
-    // ✅ בדוק אם המשתמש הוא מנהל
-    useEffect(() => {
-        const checkAdminStatus = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    setIsAdmin(false);
-                    return;
-                }
-
-                const response = await axios.get('http://localhost:5000/user/profile', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-
-                setIsAdmin(response.data.role === 'admin' || response.data.isAdmin === true);
-            } catch (error) {
-                console.error("Error checking admin status:", error);
-                setIsAdmin(false);
-            }
-        };
-
-        checkAdminStatus();
-    }, []);
+    // ✅ קבל את נתוני ההרשאה מ-Redux דרך useAuth
+    const { isAdmin } = useAuth();
 
     // ✅ טען את השיעורים עם TOKEN
     useEffect(() => {
@@ -96,48 +73,50 @@ const WordsTable = () => {
         fetchLessons();
     }, []);
 
-    // ✅ טען את המילים של השיעור הנוכחי
-    useEffect(() => {
-        const fetchWords = async () => {
-            if (!lessonId) {
-                setError("No lesson ID provided!");
-                return;
-            }
+    // ✅ פונקציה להטעינה מחדש של המילים
+    const fetchWords = useCallback(async () => {
+        if (!lessonId) {
+            setError("No lesson ID provided!");
+            return;
+        }
 
-            setLoading(true);
-            try {
-                const token = localStorage.getItem('token');
-                
-                const response = await axios.get(
-                    `http://localhost:5000/words/lesson/${lessonId}`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                    }
-                );
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
 
-                if (Array.isArray(response.data)) {
-                    setWords(response.data);
-                    setError(null);
-                } else if (response.data && Array.isArray(response.data.words)) {
-                    setWords(response.data.words);
-                    setError(null);
-                } else {
-                    setWords([]);
+            const response = await axios.get(
+                `http://localhost:5000/words/lesson/${lessonId}`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
                 }
-            } catch (error) {
-                console.error("Error fetching words:", error.response?.data || error.message);
-                setError("שגיאה בטעינת המילים");
-                setWords([]);
-            } finally {
-                setLoading(false);
-            }
-        };
+            );
 
-        fetchWords();
+            if (Array.isArray(response.data)) {
+                setWords(response.data);
+                setError(null);
+            } else if (response.data && Array.isArray(response.data.words)) {
+                setWords(response.data.words);
+                setError(null);
+            } else {
+                setWords([]);
+            }
+        } catch (error) {
+            console.error("Error fetching words:", error.response?.data || error.message);
+            setError("שגיאה בטעינת המילים");
+            setWords([]);
+        } finally {
+            setLoading(false);
+        }
     }, [lessonId]);
 
+    // ✅ טען את המילים של השיעור הנוכחי
+    useEffect(() => {
+        fetchWords();
+    }, [lessonId, fetchWords]);
+
+    // ✅ מחיקת מילה - עם בדיקת הרשאות מ-Redux
     const handleDelete = async (id) => {
         if (!isAdmin) {
             setShowAdminMessage(true);
@@ -156,6 +135,7 @@ const WordsTable = () => {
         }
     };
 
+    // ✅ עריכת מילה - עם בדיקת הרשאות מ-Redux
     const handleEdit = (word) => {
         if (!isAdmin) {
             setShowAdminMessage(true);
@@ -240,8 +220,11 @@ const WordsTable = () => {
                 <Button
                     onClick={prevPage}
                     disabled={page === 0}
-                    startIcon={<ArrowBackIcon />}
+                    startIcon={<ArrowForwardIcon />}
                     variant="outlined"
+                    sx={{
+                        gap: '8px'
+                    }}
                 >
                     הקודם
                 </Button>
@@ -251,13 +234,15 @@ const WordsTable = () => {
                 <Button
                     onClick={nextPage}
                     disabled={(page + 1) * itemsPerPage >= words.length}
-                    endIcon={<ArrowForwardIcon />}
+                    startIcon={<ArrowBackIcon />}
                     variant="outlined"
+                    sx={{
+                        gap: '8px'
+                    }}
                 >
                     הבא
                 </Button>
             </Box>
-
             <Box textAlign="center" marginBottom="20px">
                 {isAdmin ? (
                     <Button
